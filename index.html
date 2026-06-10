@@ -5,95 +5,118 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mok Transports Services · Sales Pipeline</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root {
-  --navy: #0d1f35;
-  --navy2: #152a47;
-  --navy3: #1e3a5f;
-  --blue: #2d7dd2;
-  --blue-light: #5fa3e8;
-  --blue-pale: #ddeeff;
-  --teal: #1aaf82;
-  --teal-pale: #d6f5ec;
-  --amber: #f5a623;
-  --amber-pale: #fef3dc;
-  --coral: #e85d3a;
-  --coral-pale: #fde8e3;
-  --purple: #7c5cbf;
-  --purple-pale: #ede9f8;
-  --pink: #d44f8a;
-  --pink-pale: #fce8f2;
-  --white: #ffffff;
-  --off: #f7f8fc;
-  --surface: #eef1f7;
-  --border: rgba(13,31,53,0.10);
-  --border2: rgba(13,31,53,0.18);
-  --text: #0d1f35;
-  --text2: #4a6080;
-  --text3: #8fa3ba;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 2px 12px rgba(13,31,53,0.08);
-  --shadow-md: 0 4px 24px rgba(13,31,53,0.12);
+:root{
+  --navy:#0d1f35;--navy2:#152a47;--navy3:#1e3a5f;
+  --blue:#2d7dd2;--blue-light:#5fa3e8;--blue-pale:#ddeeff;
+  --teal:#1aaf82;--teal-pale:#d6f5ec;
+  --amber:#f5a623;--amber-pale:#fef3dc;
+  --coral:#e85d3a;--coral-pale:#fde8e3;
+  --purple:#7c5cbf;--purple-pale:#ede9f8;
+  --pink:#d44f8a;--pink-pale:#fce8f2;
+  --white:#fff;--off:#f7f8fc;--surface:#eef1f7;
+  --border:rgba(13,31,53,0.10);--border2:rgba(13,31,53,0.18);
+  --text:#0d1f35;--text2:#4a6080;--text3:#8fa3ba;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 2px 12px rgba(13,31,53,0.08);--shadow-md:0 4px 24px rgba(13,31,53,0.12);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);min-height:100vh;font-size:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--off);color:var(--text);min-height:100vh;font-size:14px}
 
-/* LOGIN */
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);position:relative;overflow:hidden}
-#login-screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 40%,rgba(45,125,210,0.18) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 10% 90%,rgba(26,175,130,0.12) 0%,transparent 60%);pointer-events:none}
-.login-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:48px 40px;width:360px;position:relative;backdrop-filter:blur(20px)}
-.login-logo{display:flex;align-items:center;gap:12px;margin-bottom:36px}
-.login-logo-icon{width:44px;height:44px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center}
-.login-logo-text{color:#fff;font-size:18px;font-weight:600;line-height:1.1}
-.login-logo-sub{color:rgba(255,255,255,0.45);font-size:11px;font-weight:400}
-.login-title{color:rgba(255,255,255,0.9);font-size:22px;font-weight:600;margin-bottom:6px}
-.login-sub{color:rgba(255,255,255,0.4);font-size:13px;margin-bottom:28px}
-.role-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px}
-.role-btn{padding:14px 8px;border-radius:var(--radius-sm);border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);cursor:pointer;text-align:center;transition:all .2s;color:rgba(255,255,255,0.6);font-family:inherit}
-.role-btn:hover{border-color:rgba(45,125,210,0.5);background:rgba(45,125,210,0.1);color:#fff}
-.role-btn.selected{border-color:var(--blue);background:rgba(45,125,210,0.2);color:#fff}
-.role-btn-name{font-size:12px;font-weight:600;margin-bottom:2px}
-.role-btn-title{font-size:10px;opacity:0.6}
-.login-btn{width:100%;padding:14px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
-.login-btn:hover{background:var(--blue-light)}
-.login-divider{text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin:12px 0}
+/* ── LOGIN ────────────────────────────────── */
+#login-screen{min-height:100vh;display:flex;background:var(--navy);overflow:hidden}
+.login-left{flex:1;display:flex;flex-direction:column;justify-content:space-between;padding:48px 56px;position:relative;overflow:hidden}
+.login-left::before{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 20%,rgba(45,125,210,0.22) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 60% at 10% 80%,rgba(26,175,130,0.15) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%,rgba(45,125,210,0.06) 0%,transparent 80%);
+  pointer-events:none}
+.login-left-top{position:relative}
+.login-brand{display:flex;align-items:center;gap:14px;margin-bottom:80px}
+.login-brand img{height:44px;object-fit:contain}
+.login-brand-name{color:#fff;font-size:16px;font-weight:600;line-height:1.2}
+.login-brand-sub{color:rgba(255,255,255,0.4);font-size:11px}
+.login-headline{color:#fff;font-size:42px;font-weight:600;line-height:1.15;letter-spacing:-0.03em;margin-bottom:20px;max-width:420px}
+.login-headline span{color:var(--blue-light)}
+.login-desc{color:rgba(255,255,255,0.45);font-size:14px;line-height:1.7;max-width:380px}
+.login-stats{display:flex;gap:32px;margin-top:48px;position:relative}
+.login-stat-val{color:#fff;font-size:28px;font-weight:600;font-family:"DM Mono",monospace;letter-spacing:-0.02em;margin-bottom:4px}
+.login-stat-lbl{color:rgba(255,255,255,0.35);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.login-stat-divider{width:1px;background:rgba(255,255,255,0.08);flex-shrink:0}
+.login-bottom{color:rgba(255,255,255,0.2);font-size:11px;position:relative}
+.login-right{width:460px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:48px 40px;background:rgba(255,255,255,0.025);border-left:1px solid rgba(255,255,255,0.06)}
+.login-form-wrap{width:100%;max-width:340px}
+.lf-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(45,125,210,0.15);border:1px solid rgba(45,125,210,0.25);border-radius:20px;padding:4px 12px;color:var(--blue-light);font-size:11px;font-weight:500;margin-bottom:28px}
+.lf-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+.lf-title{color:#fff;font-size:26px;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px}
+.lf-sub{color:rgba(255,255,255,0.35);font-size:13px;margin-bottom:36px;line-height:1.5}
+.lf-label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.lf-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:14px;transition:all .2s;outline:none;margin-bottom:16px}
+.lf-input:focus{background:rgba(255,255,255,0.09);border-color:rgba(45,125,210,0.6);box-shadow:0 0 0 3px rgba(45,125,210,0.12)}
+.lf-input::placeholder{color:rgba(255,255,255,0.2)}
+.lf-input option{background:#1e3a5f;color:#fff}
+.lf-select-wrap{position:relative;margin-bottom:28px}
+.lf-select-wrap select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px}
+.lf-select-wrap::after{content:"▾";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,0.3);pointer-events:none;font-size:12px}
+.lf-divider{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.lf-divider-line{flex:1;height:1px;background:rgba(255,255,255,0.08)}
+.lf-divider-text{color:rgba(255,255,255,0.2);font-size:11px}
+.lf-pin-row{display:flex;gap:8px;margin-bottom:28px}
+.lf-pin{width:100%;padding:14px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:var(--radius-sm);color:#fff;font-family:"DM Mono",monospace;font-size:20px;font-weight:500;text-align:center;letter-spacing:.1em;outline:none;transition:all .2s}
+.lf-pin:focus{background:rgba(255,255,255,0.09);border-color:rgba(45,125,210,0.6);box-shadow:0 0 0 3px rgba(45,125,210,0.12)}
+.lf-btn{width:100%;padding:14px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.01em;position:relative;overflow:hidden}
+.lf-btn:hover{background:var(--blue-light);transform:translateY(-1px);box-shadow:0 4px 16px rgba(45,125,210,0.35)}
+.lf-btn:active{transform:translateY(0)}
+.lf-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.lf-error{background:rgba(232,93,58,0.12);border:1px solid rgba(232,93,58,0.25);border-radius:var(--radius-sm);padding:10px 14px;color:#ff9b7d;font-size:12px;margin-bottom:16px;display:none}
+.lf-error.show{display:block}
+.lf-loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lf-footer{text-align:center;color:rgba(255,255,255,0.2);font-size:11px;margin-top:24px;line-height:1.5}
 
-/* APP SHELL */
+/* ── APP SHELL ────────────────────────────── */
 #app{display:none;min-height:100vh;flex-direction:column}
-.topbar{background:var(--navy);height:56px;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:50}
+.topbar{background:var(--navy);height:58px;display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(255,255,255,0.06)}
 .tb-logo{display:flex;align-items:center;gap:10px;margin-right:8px}
-.tb-logo-icon{width:30px;height:30px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center}
-.tb-logo-text{color:#fff;font-size:14px;font-weight:600}
-.tb-logo-sub{color:rgba(255,255,255,0.35);font-size:10px}
+.tb-logo img{height:30px;object-fit:contain}
+.tb-logo-text{color:#fff;font-size:13px;font-weight:600}
+.tb-logo-sub{color:rgba(255,255,255,0.3);font-size:10px}
 .tb-nav{display:flex;gap:2px;flex:1}
 .tb-tab{padding:6px 14px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
 .tb-tab:hover{color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.06)}
 .tb-tab.active{color:#fff;background:rgba(255,255,255,0.12)}
 .tb-right{display:flex;align-items:center;gap:10px;margin-left:auto}
 .tb-user{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.7);font-size:12px}
-.tb-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
-.tb-logout{padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-family:inherit;font-size:11px;cursor:pointer}
+.tb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.tb-logout{padding:5px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;font-size:11px;cursor:pointer;transition:all .15s}
 .tb-logout:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8)}
-.add-deal-btn{padding:7px 14px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .15s}
+.add-deal-btn{padding:7px 16px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
 .add-deal-btn:hover{background:var(--blue-light)}
-
+.owner-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--amber-pale);color:#9a6800;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:6px}
 .main{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}
 .view{display:none}.view.active{display:block}
 
-/* STATS */
+/* ── TOAST ────────────────────────────────── */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;font-size:12px;padding:10px 16px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.1);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:280px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{border-color:var(--teal);background:#0a2e24}
+#toast.error{border-color:var(--coral);background:#2e0f0a}
+
+/* ── STATS ────────────────────────────────── */
 .stats-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
 .stat-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
-.stat-card::after{content:'';position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 3px 3px 0}
+.stat-card::after{content:"";position:absolute;top:0;right:0;width:3px;height:100%;border-radius:0 3px 3px 0}
 .stat-card.blue::after{background:var(--blue)}
 .stat-card.teal::after{background:var(--teal)}
 .stat-card.amber::after{background:var(--amber)}
 .stat-card.coral::after{background:var(--coral)}
 .stat-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-.stat-value{font-size:24px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace;letter-spacing:-.02em}
+.stat-value{font-size:24px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace;letter-spacing:-.02em}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:3px}
 
-/* PIPELINE */
+/* ── PIPELINE ─────────────────────────────── */
 .filters-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .filter-label{font-size:11px;color:var(--text3);font-weight:500}
 .fc{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--border2);background:#fff;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s;font-weight:500}
@@ -103,14 +126,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .k-col{background:var(--surface);border-radius:var(--radius);padding:10px}
 .k-col-hd{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;text-transform:uppercase;letter-spacing:.05em}
 .k-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:6px;flex-shrink:0}
-.k-cnt{font-size:10px;background:#fff;border-radius:10px;padding:2px 7px;color:var(--text3);font-family:'DM Mono',monospace}
+.k-cnt{font-size:10px;background:#fff;border-radius:10px;padding:2px 7px;color:var(--text3);font-family:"DM Mono",monospace}
 .k-cards{min-height:100px;display:flex;flex-direction:column;gap:7px}
 .deal-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 12px;cursor:pointer;transition:all .2s;position:relative}
 .deal-card:hover{border-color:var(--blue);box-shadow:var(--shadow)}
 .deal-card:hover .move-hint{opacity:1}
 .move-hint{position:absolute;top:8px;right:8px;font-size:9px;color:var(--blue);opacity:0;transition:opacity .15s;font-weight:600}
 .deal-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;padding-right:20px}
-.deal-value{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:7px}
+.deal-value{font-size:12px;color:var(--text2);font-family:"DM Mono",monospace;margin-bottom:7px}
 .deal-meta{display:flex;align-items:center;justify-content:space-between}
 .agent-badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
 .deal-date{font-size:10px;color:var(--text3)}
@@ -119,10 +142,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .ship-dot{width:5px;height:5px;border-radius:50%}
 .empty-col{text-align:center;padding:20px 10px;color:var(--text3);font-size:11px;font-style:italic}
 
-/* AGENTS */
-.agents-section{margin-bottom:24px}
-.section-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.agent-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+/* ── AGENTS ───────────────────────────────── */
+.agent-cards-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .a-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:box-shadow .2s}
 .a-card:hover{box-shadow:var(--shadow-md)}
 .a-top{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -131,11 +152,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .a-role{font-size:11px;color:var(--text3)}
 .a-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
 .a-stat{background:var(--off);border-radius:var(--radius-sm);padding:9px 10px;text-align:center}
-.a-stat-v{font-size:15px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.a-stat-v{font-size:15px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace}
 .a-stat-l{font-size:10px;color:var(--text3);margin-top:2px}
 .target-wrap{margin-bottom:14px}
 .target-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px}
-.target-labels span:last-child{font-family:'DM Mono',monospace;font-weight:500}
+.target-labels span:last-child{font-family:"DM Mono",monospace;font-weight:500}
 .prog-bg{background:var(--surface);border-radius:4px;height:7px;overflow:hidden}
 .prog-fill{height:7px;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
 .activity-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
@@ -145,15 +166,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .act-item{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--text2);padding:6px 8px;background:var(--off);border-radius:6px;line-height:1.4}
 .act-dot{width:6px;height:6px;border-radius:50%;margin-top:4px;flex-shrink:0}
 
-/* OWNER DASHBOARD */
+/* ── DASHBOARD ────────────────────────────── */
 .dash-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
 .dash-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:18px}
 .dash-card.wide{grid-column:span 2}
-.dash-card.full{grid-column:span 3}
 .dash-card-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
 .leaderboard{display:flex;flex-direction:column;gap:10px}
 .lb-row{display:flex;align-items:center;gap:10px}
-.lb-rank{font-size:11px;font-weight:700;color:var(--text3);width:16px;font-family:'DM Mono',monospace}
+.lb-rank{font-size:11px;font-weight:700;color:var(--text3);width:16px;font-family:"DM Mono",monospace}
 .lb-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
 .lb-info{flex:1;min-width:0}
 .lb-name{font-size:12px;font-weight:600;color:var(--text)}
@@ -161,27 +181,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .lb-bar-wrap{width:100px;flex-shrink:0}
 .lb-bar-bg{background:var(--surface);border-radius:4px;height:5px}
 .lb-bar-fill{height:5px;border-radius:4px}
-.lb-value{font-size:11px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace;min-width:70px;text-align:right}
-.comparison-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.comp-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
-.comp-row:last-child{border-bottom:none}
-.comp-label{font-size:11px;color:var(--text2)}
-.comp-vals{display:flex;gap:12px}
-.comp-val{font-size:12px;font-weight:600;font-family:'DM Mono',monospace;text-align:right;min-width:60px}
-.comp-header{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:8px}
-.comp-agent-label{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
-.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px}
-.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height .4s;min-height:4px}
-.chart-bar-label{font-size:9px;color:var(--text3);text-align:center}
-.chart-bar-val{font-size:9px;font-weight:600;color:var(--text2);font-family:'DM Mono',monospace}
+.lb-value{font-size:11px;font-weight:600;color:var(--text);font-family:"DM Mono",monospace;min-width:70px;text-align:right}
 .pipeline-stage-row{display:flex;flex-direction:column;gap:7px}
 .ps-row{display:flex;align-items:center;gap:8px}
 .ps-label{font-size:11px;color:var(--text2);width:90px;flex-shrink:0}
 .ps-bar-bg{flex:1;background:var(--surface);border-radius:4px;height:8px;overflow:hidden}
 .ps-bar-fill{height:8px;border-radius:4px}
-.ps-count{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);min-width:20px;text-align:right}
-.ps-value{font-size:10px;font-family:'DM Mono',monospace;color:var(--text2);min-width:65px;text-align:right}
+.ps-count{font-size:10px;font-family:"DM Mono",monospace;color:var(--text3);min-width:20px;text-align:right}
+.ps-value{font-size:10px;font-family:"DM Mono",monospace;color:var(--text2);min-width:65px;text-align:right}
 .alerts-list{display:flex;flex-direction:column;gap:7px}
 .alert-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);border-left:3px solid}
 .alert-item.warn{background:var(--amber-pale);border-color:var(--amber)}
@@ -190,22 +197,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .alert-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
 .alert-body{font-size:11px;color:var(--text2);line-height:1.4}
 
-/* CARRIERS */
-.carrier-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.c-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.c-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.c-name{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-.02em}
-.c-badge{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600}
-.c-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
-.c-metric{background:var(--off);border-radius:var(--radius-sm);padding:10px 12px}
-.c-metric-v{font-size:16px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
-.c-metric-l{font-size:10px;color:var(--text3);margin-top:2px}
-.c-routes-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
-.c-routes{display:flex;flex-direction:column;gap:5px}
-.c-route{display:flex;align-items:center;justify-content:space-between;padding:7px 9px;background:var(--off);border-radius:var(--radius-sm)}
-.c-route-name{font-size:12px;font-weight:500;color:var(--text)}
-.c-route-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
-.c-route-status{width:6px;height:6px;border-radius:50%}
+/* ── CARRIERS ─────────────────────────────── */
 .vs-bar{background:var(--off);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px}
 .vs-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
 .vs-rows{display:flex;flex-direction:column;gap:8px}
@@ -213,26 +205,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--off);color:var(--text);mi
 .vs-label{font-size:11px;color:var(--text2)}
 .vs-fill-wrap{display:flex;align-items:center;gap:6px;overflow:hidden}
 .vs-fill{height:6px;border-radius:3px;transition:width .5s}
-.vs-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--text);font-weight:500;white-space:nowrap}
+.vs-val{font-size:11px;font-family:"DM Mono",monospace;color:var(--text);font-weight:500;white-space:nowrap}
 
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(13,31,53,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.overlay.open{display:flex}
-.modal{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:24px;width:380px;max-width:95vw;max-height:90vh;overflow-y:auto}
-.modal-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.fg{margin-bottom:0}
-.fg.full{grid-column:span 2}
-.fl{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.04em}
-input[type=text],select,input[type=number]{width:100%;padding:9px 11px;font-size:13px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--off);color:var(--text);font-family:inherit;transition:border-color .15s}
-input[type=text]:focus,select:focus,input[type=number]:focus{outline:none;border-color:var(--blue);background:#fff}
-.modal-btns{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
-.btn-primary{padding:9px 20px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
-.btn-primary:hover{background:var(--blue-light)}
-.btn-secondary{padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:#fff;color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer}
-.btn-secondary:hover{background:var(--off)}
-
-/* TIPS */
+/* ── TIPS ─────────────────────────────────── */
 .tips-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .tips-header-title{font-size:16px;font-weight:600;color:var(--text)}
 .tip-cats{display:flex;gap:6px;flex-wrap:wrap}
@@ -251,60 +226,120 @@ input[type=text]:focus,select:focus,input[type=number]:focus{outline:none;border
 .tip-step-num{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
 .tip-footer{padding:8px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .tip-cat-label{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.04em}
-.tip-expand{font-size:10px;color:var(--blue);font-weight:600}
-.tip-card.expanded .tip-steps{display:flex}
 .playbook-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .playbook-text{color:#fff}
 .playbook-title{font-size:15px;font-weight:600;margin-bottom:4px}
 .playbook-sub{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.4}
 .playbook-icon{font-size:40px;flex-shrink:0}
 
-/* SCROLLBAR */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+/* ── MODAL ────────────────────────────────── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(13,31,53,0.55);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius);border:1px solid var(--border);padding:24px;width:380px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{margin-bottom:0}
+.fg.full{grid-column:span 2}
+.fl{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;display:block;text-transform:uppercase;letter-spacing:.04em}
+input[type=text],select,input[type=number],textarea{width:100%;padding:9px 11px;font-size:13px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--off);color:var(--text);font-family:inherit;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff}
+.modal-btns{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+.btn-primary{padding:9px 20px;border-radius:var(--radius-sm);border:none;background:var(--blue);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-primary:hover{background:var(--blue-light)}
+.btn-secondary{padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:#fff;color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer}
+.btn-secondary:hover{background:var(--off)}
+.sec-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
 
-/* BADGE */
-.owner-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--amber-pale);color:#9a6800;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:6px}
+/* ── LOG MODAL ────────────────────────────── */
+.log-modal{width:340px}
+
+/* ── LOADING OVERLAY ──────────────────────── */
+#loading-overlay{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:16px;transition:opacity .4s}
+#loading-overlay.hidden{opacity:0;pointer-events:none}
+.loading-spinner{width:32px;height:32px;border:2px solid rgba(255,255,255,0.15);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+.loading-text{color:rgba(255,255,255,0.4);font-size:12px}
+@media(max-width:900px){
+  .login-left{display:none}
+  .login-right{width:100%;border-left:none}
+  .kanban{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Mok Transports Services...</div>
+</div>
+
 <!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">
-      <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADJAXcDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAYIBQcDBAkCAf/EAEMQAAEDBAECAwQGBQkJAQAAAAABAgMEBQYRBxIhCBMxIkFRYRQVMnGBkQkWFyNSM1ZygpKhorHRGCQlJkJDU5OUwf/EABoBAQADAQEBAAAAAAAAAAAAAAADBQYEBwL/xAAqEQEAAQMDAgUDBQAAAAAAAAAAAQIDBAUhMRFhEhQiQXEygZFCUdHh8f/aAAwDAQACEQMRAD8AuWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAArjyLz5meFZhXY7ccUtSvp37il86REmiXux6fen5LtPcR7/anyP+atp/8AfIbP8UXHX644f9c22DrvVoY6SNGp7U8Pq+P5r/1J80VPeUsN1pOHp+djxXNuPFG088/n3ZbUMnMxb00xXtPHC+vCHI9LyPiz6/yY6S5UsnlVlK120Yvq1yb7q1U/vRU9xPigHDOdVPH+cU14ar30Mn7mvhb/ANyFV7qifxN+0n3a95fihraWuoIK+knjlpqiNskUjV9l7XJtFT8DP63pvkr/AFoj0Vcduy20zN81a9X1Rz/LnB8+ZH/5G/mEexV0j2qv3lKs30AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUu8UfHX6n5f9d22Dpst3e57UanswT+r2fJF+0n4p7i6JH+RMUt+a4hXY9cURI6ln7uTW1ikTux6fNF/u2nvLPSdQnByIr/AEztPx/Th1DEjKszT7xw87CzHhLz1ldQy8cXqf2mtdLapHr316uiT7vtJ8upPcairOIeQ6asmp0xyedIpHMSWORisfpddSd/RTktXG/KFqudNc7dj1dT1lLK2WGVr2IrXNXaL9o2+oVYWbjzam7T23jaWXw6cnFvRXFE99p4W7qIXwTPhkTTmLpT5jc6N7XsXpc1doqe5TirL9F+oFFlmVRtx6dI2srY6lyIjXqvTpFTe0Ve6a9ykV/abx//ADttv9p3+h57GLeqmfDTM9Nto6x+YbGb9uOniqiPnZuG2VbaykbKnZ3o9Pgp2TVOLcn4S68QUVJk9DUSVcjYWQxq5XPcq6bpNeuzaxHcs3LW1dMx8x0fVFyiv6ZiVcPHnyDe8KwOx0WN3iqtVyuVwVyzUsqxyeTGxepNp30rns/Irj4fOV+S7zzbiFruuc3+soam5xRzwTVj3Mkaq90VFXuhnf0iGRfWfMNvsMbtx2e2tRyb9JJVV7v8PlkbwGyfqz4tsOsr2pG6jqbakqemnLTRudv8XKRvtbfxj8oS8ccWvitNW6nv95etLQPjdp8LU0skqfDpTsi/FyFJcY5U5hvuS2yxwch5N51fVxUrNVz97e9Gp7/mTvk2+ft08RtfUrK9+IY3TTSvei+w2ipkV8j/AL5XppP6bfgYPwd2d2W+JW01s0TUjo3z3SVrU9lvSi9CJ8ke5mgPSSli8imihWR8nlsRvW9dudpNbVfiai8WK8lS8e0lBxdS3R93qK9izzW+VI5IoWtcq+0qp6u6U/M3CfjlRrVc5URETaqvuA8u8q5K5zxa/VNiv+bZRQXKlVqT08lwcrmKrUcm9Kqeiov4m0eM7N4pb5kuOT3G6ZlDYK2pp5Z6qS4ewlM5zXOcqdW9Kzfu95pnJ5qjkrnytdFuWS/ZAsUXT/A+bpb+CN1+R6qUVNFR0cFJA3pigjbGxvwa1NIn5IBzFYvH1yJfsNx7GrXjF9rLTcK6qlnlkpJVjesUbUTSqnuVz0/slnTzu/SAZAt352W1MlR0Nmt8NP0ovZHv3K78fbb+QGDt+XeI2TAZuQ6TKsolx2mn8iWs+n9bWO2id2Ku9bcib1ralivBXzxknIVyr8OzKSOtuFLS/SqWvbGjHysRyNcyRG6RVTqRUVET37KrT8y5E3hGn4moKGhobOj3Pq540cs9UqyeZpyqukTevRO+kLSeBjha+YYlZnmUxNpKu40iQUFH1I57IXKj1kfrsiu03Seut79QLUFfvGXzXdOLbDbrRjKRsvt4SRzKmRiOSlhZpFcjV7K5VXSb7JpV0vYsCVw8cHD155Dx63ZHjELqu7WVkjX0bftVEDtKvR8XtVN696Kuu+kUK24nReJvkCzyZlj94y240aSOY2aO7rF1ub9pGR9bdoi9uya9xbTwgO5UqMFrq3lCvuEs76tYqGmr4EZURMZ2c566Ry9Tuyb39nfvKh+HHnvIuILmtiuVPJXY1JUKtXQSIrZaV+9OfHv0d27tXsuvcvc9HrNcaO8Wiju1unbPR1kDJ4JW+j2PRHNX8lA7YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABjMgrvotL5Ua/vZU0nyT3qZMj9dabhV1T53vh7r2TqXsnuT0AwR2rZSOratsSbRvq9fgh3PqCt/jh/Nf9DX/AIgs3TjzBFtlvqETILwjo4nMXvDH6Ok+WkXSfNfkT42PXk3abVHMor96mzbm5VxDTXim5Dbk+UNxm0T7stmerF6F9meoTs53zRv2U/FfeaYHzVdqS/iHCKvPs3pLHD1spUXzq6ZE/koUX2l+9fRPmp6hZtWdPxvDxTTH+ywtyu5mX+vvMt0eD3jrqc7kC7Qdk6obWx7fwfN/m1P63yLOHWtdDSWy201uoIGQUtNE2KGNiaRrWppEOyvdNKea6hm15t+btX27Q22JjU41qLcff5eY+Sy/tT8WczYV82nuuSNp41XvunZIjEX7vLZs+vFjW1Vu8TmW1dBO+nniqIkZJGulbumjRdfDsqno7Q4ni1DWsrqLGrNS1Uaq5k8NDEyRqr6qjkbtF7qflwxLFbjWSVlwxmy1dTKu5Jp6GJ739td3K3a9jidKkNsxlnGPgtveS18aRX3OXwUsCP7OZSq7qa1P6TGvevyc34Eo/Rr4+i1GW5VIxPZbDb4Xa+O5H/5RlwblZLNc6OKjuVooK2mhVFihqKZkjGaTSdLXIqJ27dj6tFptVnp3U9otlFb4Xu63R0sDYmq7WtqjURN9k7gd0hHPWRLinDeV31kiMlp7bK2FyrrUr06Gf4nITc69yoKG5Ub6O40dPWU0muuGoibIx2l2m2uRUXuB5u+CGwfXviHssr2q6K1xTV7+3p0N6W/43tPSoxdoxzHrPUPqLRYrXb5nt6HSUtJHE5zd70qtRFVN+4ygH49zWNVzlRGom1Vfch5TZVU1HJfPdbJEqyvv9/WKHp7+w+boZr7m6/I9WXNa9qtc1HNVNKiptFQwtHiGJUdXHV0eL2SnqIndccsVBEx7HfFFRu0UClX6QTjqnx7IrFmFqpmxUNfTNoKhGNREbNC32F7fxR9v6im6vAnyKmX8UpjddUI+7Y4qU6o53tPpl/knfhpWf1U+Jvu7Wu2XelSlutuo6+nRyPSKphbKxHJ6LpyKm+69zr2fHrBZpnzWix2y3SyN6XvpaRkTnN3vSq1E2gGTKRV/i6zjD83yCwXqwW69U1Fc6iCnc7qppmxtkcjUVURUXsid+nal3TB5Bh+J5C/zL7jNnub/AOOqoo5Xfm5FUDzDzq83zmrl2putmxlkVzvErGx0FA1X90ajepy67qutucuk9VXR6acXY9NifHGPY1USpLPbbdDTSvRdor2sRHa+W9nfx/Gsdx6NY7DYbZa2qmlSkpWRb+/pRNmVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADo5BdqCw2SsvF0nSCjo4nSzPX3NT4fFV9ET3qef8AyZmFdnOZVuQ1yq1JndNPCq9oYU+wxPw7r8VVS/8Af7Lar/bX229UEFfRvcjnQzN6mOVF2m0+8jf7KeN/5lWX/wCVpeaPqOPgTVXXTM1T8bQq9Rwr2X0ppqiKYUAY1z3tZG1XvcqNa1qbVVX0RC8/h348bgWERpWRN+urj0z1ztd2dvZi38Gov5qpnqDjTAKCtgraPELPDUwPSSKRtM3bHIu0VPmhLSbV9d87bi1biYj37/si07SvK1zXXPWfYABnVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABq7xC8trxLa7PX/q/Jem3CqfDIyOo8t0TGMV7np7K9Wmoq67enqbRNdcwYHW5rkGFVEaUclutNylnuUVQ5UWSB8Do1a1ERdqvV79AYblXnChw3JcQstts7r2uRLDI+ZlR5baWnmlZHFKvsr1dSvXSdvsqfV35Wya4Zlfcd46wH9Z0x17YrpV1FzZRxpMqb8mLbXK9yIi7VdIip9yrr+z8B5vBj0EN0vNsr7nR321JSSukcjY7RQOcsce+j+UXrcqp6bRO5MUwnk7B86yy8cdpjF0tmUVSV0sF3nlhko6nWnORWNcj2Kq712X0T5qHNFz5Z6rGsMv1JaZI4Mgvf1PWsq50idbJGovmK9dKjunp37toqL29CW8V53UZ+25XehsclHjMc6w2q4TyKj7kjV0+VsfT7Me001VVVd8ENVT+HetkwfC8Zr6u3XhtJk7r3kazK+OOpSRF81kaIm1TSoiIut6323o2Nwlh2S4BDdsVq6ynr8Vp6hZcelWZzqmnheqqtPIiprTFX2XIq9t+nZECLVfLnJMHJjMAbxVQPustG64Q/wDMjEY6lSRY+tV8rs7afZ9TqZR4grnYbtlk0mBfSsbxW5soLlcI7vG2ZFerURzIHNTq+0nZHf8A7qaVmD3ibxHUPIbZaT6ogxt9rexXr53nLOr0VG6106X136+41nkfh4uV0yHMsujdZ2ZLNkEV3x2eZXyw9DETcNRGrenpcvwRVTsu/cBO+bOZWcevtEVvx2e/zVdJLcquOOfynUlDF09c7kVq7+12Tt6KcfM/NtHx1U4rLHY5r3bL5HLUy1VNNpaemjSNzpkb0r1ojZOr1TshH7hwvk+ccg5HluZ5LW482vtsNqo6Sw1qO/3Xo/fxyuki9prpFVdIievc+cI4hzGlm40gymezV9HiVPdbfWdMr3/SaSeLy4ERqt0um+y5F9ERNbAmF85gttryu7WxtufXW234h+tDa6llR61EXWrUYxmu+0TaO3ruYfHOX8pruOLxn9ywShpbFS2aS60U1Lfo6lZ1anUkD2tYixv16r30qaXuR/jfhvOsCzrIrnbLlZrnaorFLa8ZiuEsjljjdOkzIZ9N30NVz27RVXWu3uTo2vhXNJEzurSgxfFY8hx2a2R2W0Vcz6Sarevaqk6mIkek9nTG+ir89hKsK50qay8W235ph641Fd7HJfLdVxXFlZHJTMj8x/WjWtdGqM2vdF+B0F55ySLFIuQ6rjCqiwCSRv8AxFLnG6sbA5/Qk603T9lV126t99+ncz/HPBmH43gn1bNZqeK+19i+q7pcI5pJnu64uiVI3SKvS1V2qIiInp2IXLxfzHVcWxcOVNdiLMZY1lI+9xvmWrdSNejkakCt6Uk0iN31a1+YEkzrmy72fNLpZMcwqHIKK1WSO+VVWt3ZSr9Gcm1VjXsVHKid9b7nXzjnK/2bD7Fm1lwBlzxq9Q0vkVM92bTzMnnVUSJ0XQ70XXtIuu5jM98OlNmOc3msuD6aO1OxqmttmmSVyz0tTCqdL3M0jXN0mlRVXaKvZPUkGf4FnGacK4/jVfHYaTIKC4Uc1V9Hlc2kcyB/dY9MRW7aiKjdIiL29AOPIOX8xtV+sOHv4+oG5fdaaasWinv8cdMyJj1a1rJ1ZqSR2t9CNTROctzWXEeKazN8isc9PPQ0KVNVbYJmzPjeuk8vzETpXSqiK5OyJtSIeIPCssziJLRb8Vwy9Wt1MqQ1F1qZoKuhqV2nmxujavsonSukVFVUXe0JLbcfy2w8MUWN0lbbMhyKkt8dM6W8da01WqaR7ZFTblRW9TUVd+7fvAisfLeWUfF18z6+4Jb6e30NBHW0L6K/x1TKxHORFYqtZ7Ct2m10qfA69bzPktp4rv2e33CbbT09up6WalgpL+yqdUedI1unq2P91pHIvdF33QiNBwZmbsT5Eo4oMdxuPJqGKnorDbqyaShhma5FdOquanQqoippjddzsz8OZfW8J5Vg8OJ4HjdfcqaijhqLVUS6q3wytc506rEip2RVTW+7lAkTOcb9A3KbXduPlpMksNkS+NoobqyohqqXqRHKkrWey9EVV6Vb30SWs5Zo5a7juisNtW5zZsnnxJ5/R9FpWxJJJK7su1ai6122qL3MTxpxNJx5yBdnWCjtTsOv1Ez6bSyOctRS1LG9Koxyoqvhem9tc7sq9u3rjOBeG77g2cV91v8AcqSvt1tpJLXi8cb3OfT0b6h8zvM2iIj/AGmt7b7IqAc1Dz9DWcb2XIqbFaipvl/us1rtNlhqm7nljkVqudKqIjGIiIqrpdbT7zuZhyrmuFcd1uS5bx3S0VZDX09HTU0N7ZLFUpKuuvzEZ7HSukVHJ/cRKzcHZnaeOcQbb7jZmZdid8q7nSNlc91HURzSOV0T3I1HN23p7onbv96Z7lXDeUuTOJ62w3y24lQ3NbnTVFNTw1s0kD4o3dT0lese9qvZERPQDsZJzNkGM4dS3S/YbbIbncrzHarfT0+QRS0yue3q8yao6EbE1NL2VFU2TgV0yS7WL6VlOOwWGvSVzUp4bg2rjkZpOmRr2onZdr2VN9jVsGD5lS8eVFgpeMuLYoaqvV9ZaGTTJSzxLGiJIjvKTplRyIndq9kTSopKPDtgt94/waezX2up5XzV81VTUdNNJLBboX66aeN8ntOa3Srtfiv3qGyQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/9k=" style="height:52px;object-fit:contain" alt="MTRS Logo"/>
-      <div>
-        <div class="login-logo-text">Mok Transports Services</div>
-        <div class="login-logo-sub">Sales pipeline system</div>
+<div id="login-screen" style="display:none">
+  <div class="login-left">
+    <div class="login-left-top">
+      <div class="login-brand">
+        <img src="data:image/png;base64,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" alt="MTRS">
+        <div>
+          <div class="login-brand-name">Mok Transports Services</div>
+          <div class="login-brand-sub">booking.moktransports.com</div>
+        </div>
+      </div>
+      <div class="login-headline">Move more.<br>Sell <span>smarter.</span><br>Track everything.</div>
+      <div class="login-desc">The internal sales pipeline for the Mok Transports Services team. Track every deal, manage shipments, and grow client accounts — all in one place.</div>
+      <div class="login-stats">
+        <div>
+          <div class="login-stat-val">3</div>
+          <div class="login-stat-lbl">Team members</div>
+        </div>
+        <div class="login-stat-divider"></div>
+        <div>
+          <div class="login-stat-val">5</div>
+          <div class="login-stat-lbl">Pipeline stages</div>
+        </div>
+        <div class="login-stat-divider"></div>
+        <div>
+          <div class="login-stat-val">2</div>
+          <div class="login-stat-lbl">Carrier partners</div>
+        </div>
       </div>
     </div>
-    <div class="login-title">Sign in</div>
-    <div class="login-sub">Select your profile to continue</div>
-    <div class="role-btns">
-      <div class="role-btn" onclick="selectRole('owner')" id="role-owner">
-        <div class="role-btn-name" style="color:inherit">Ryan</div>
-        <div class="role-btn-title">Owner / Admin</div>
+    <div class="login-bottom">© 2026 Mok Transports Services · All rights reserved</div>
+  </div>
+  <div class="login-right">
+    <div class="login-form-wrap">
+      <div class="lf-tag"><span class="lf-tag-dot"></span>Secure sign in</div>
+      <div class="lf-title">Welcome back</div>
+      <div class="lf-sub">Sign in to access the sales pipeline and your deals.</div>
+      <div id="lf-error" class="lf-error"></div>
+      <label class="lf-label">Select your profile</label>
+      <div class="lf-select-wrap">
+        <select id="lf-profile" class="lf-input" style="margin-bottom:0">
+          <option value="">— Choose profile —</option>
+          <option value="ryan">Ryan Mokgethi · Owner</option>
+          <option value="neo">Neo Lumkwana · Operations &amp; Sales</option>
+          <option value="mavis">Mavis Selomana · Operations &amp; Sales</option>
+        </select>
       </div>
-      <div class="role-btn" onclick="selectRole('neo')" id="role-neo">
-        <div class="role-btn-name" style="color:inherit">Neo</div>
-        <div class="role-btn-title">Operations &amp; Sales</div>
+      <div class="lf-divider"><div class="lf-divider-line"></div><div class="lf-divider-text">then enter your PIN</div><div class="lf-divider-line"></div></div>
+      <label class="lf-label">4-digit PIN</label>
+      <div class="lf-pin-row">
+        <input class="lf-pin" type="password" maxlength="1" id="pin1" inputmode="numeric" pattern="[0-9]">
+        <input class="lf-pin" type="password" maxlength="1" id="pin2" inputmode="numeric" pattern="[0-9]">
+        <input class="lf-pin" type="password" maxlength="1" id="pin3" inputmode="numeric" pattern="[0-9]">
+        <input class="lf-pin" type="password" maxlength="1" id="pin4" inputmode="numeric" pattern="[0-9]">
       </div>
-      <div class="role-btn" onclick="selectRole('mavis')" id="role-mavis">
-        <div class="role-btn-name" style="color:inherit">Mavis</div>
-        <div class="role-btn-title">Operations &amp; Sales</div>
-      </div>
+      <button class="lf-btn" id="lf-btn" onclick="doLogin()">Sign in to pipeline</button>
+      <div class="lf-footer">Default PIN for all profiles is <strong style="color:rgba(255,255,255,0.5)">1234</strong><br>Ask Lerato to update PINs in Database.</div>
     </div>
-    <button class="login-btn" onclick="doLogin()">Sign in</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none;flex-direction:column;min-height:100vh">
+<div id="app">
   <div class="topbar">
     <div class="tb-logo">
-      <img src="data:image/png;base64,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" style="height:34px;object-fit:contain" alt="MTRS"/>
+      <img src="data:image/png;base64,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" alt="MTRS">
       <div>
         <div class="tb-logo-text">Mok Transports Services</div>
         <div class="tb-logo-sub">Sales pipeline</div>
@@ -320,55 +355,51 @@ input[type=text]:focus,select:focus,input[type=number]:focus{outline:none;border
     </div>
   </div>
   <div class="main">
-    <!-- PIPELINE VIEW -->
     <div id="view-pipeline" class="view">
       <div class="stats-row" id="stats-row"></div>
       <div class="filters-row" id="filters-row"></div>
       <div class="kanban" id="kanban-board"></div>
     </div>
-    <!-- MY DEALS (agent) -->
     <div id="view-mydeals" class="view">
       <div class="stats-row" id="my-stats-row"></div>
       <div class="kanban" id="my-kanban-board"></div>
     </div>
-    <!-- AGENTS VIEW (owner only) -->
     <div id="view-agents" class="view">
-      <div class="agent-cards" id="agent-cards" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px"></div>
+      <div class="agent-cards-grid" id="agent-cards"></div>
     </div>
-    <!-- OWNER DASHBOARD -->
     <div id="view-dashboard" class="view">
       <div id="dashboard-content"></div>
     </div>
-    <!-- CARRIERS -->
     <div id="view-carriers" class="view">
       <div id="carriers-content"></div>
     </div>
-    <!-- TIPS -->
     <div id="view-tips" class="view"></div>
   </div>
 </div>
 
 <!-- ADD DEAL MODAL -->
-<div class="overlay" id="deal-modal" onclick="closeModal(event)">
+<div class="overlay" id="deal-modal" onclick="closeOverlay(event,'deal-modal')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-title">Add new deal</div>
     <div class="form-grid">
       <div class="fg full"><label class="fl">Company name</label><input type="text" id="f-co" placeholder="e.g. Shoprite Holdings"/></div>
       <div class="fg"><label class="fl">Value (R)</label><input type="number" id="f-val" placeholder="e.g. 75000"/></div>
-      <div class="fg"><label class="fl">Agent</label><select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option></select></div>
+      <div class="fg" id="f-agent-wrap"><label class="fl">Agent</label>
+        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option></select>
+      </div>
       <div class="fg"><label class="fl">Stage</label>
         <select id="f-stage"><option value="0">Prospecting</option><option value="1">Qualified</option><option value="2">Proposal</option><option value="3">Negotiation</option><option value="4">Closed won</option></select>
       </div>
       <div class="fg"><label class="fl">Shipment type</label>
         <select id="f-carrier" onchange="updateShipHelp(this.value)">
           <option value="none">None yet</option>
-          <optgroup label="🚛 Mok Own Fleet">
+          <optgroup label="Mok Own Fleet">
             <option value="mok_national">Mok Fleet — National</option>
             <option value="mok_crossborder">Mok Fleet — Cross-border</option>
           </optgroup>
-          <optgroup label="📦 Via booking.moktransports.com">
-            <option value="JKJ">JKJ — Local (via Mok platform)</option>
-            <option value="DHL">DHL — International Export/Import (via Mok platform)</option>
+          <optgroup label="Via booking.moktransports.com">
+            <option value="JKJ">JKJ — Local</option>
+            <option value="DHL">DHL — International</option>
           </optgroup>
         </select>
       </div>
@@ -382,13 +413,40 @@ input[type=text]:focus,select:focus,input[type=number]:focus{outline:none;border
     </div>
     <div class="modal-btns">
       <button class="btn-secondary" onclick="document.getElementById('deal-modal').classList.remove('open')">Cancel</button>
-      <button class="btn-primary" onclick="addDeal()">Add deal</button>
+      <button class="btn-primary" id="save-deal-btn" onclick="addDeal()">Save deal</button>
     </div>
   </div>
 </div>
 
+<!-- LOG ACTIVITY MODAL -->
+<div class="overlay" id="log-modal" onclick="closeOverlay(event,'log-modal')">
+  <div class="modal log-modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="log-modal-title">Log activity</div>
+    <div class="fg full"><label class="fl">Activity note</label>
+      <textarea id="log-note" rows="3" placeholder="e.g. Called client, sent proposal, booked meeting..." style="resize:vertical"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="document.getElementById('log-modal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary" id="save-log-btn" onclick="saveLog()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
 <script>
-// ─── DATA ───────────────────────────────────────────────────────────────────
+// ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
+// 🔧 REPLACE THESE with your actual Supabase project URL and anon key
+const SUPABASE_URL = 'https://iqavpbktkzjkhpalzaul.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxYXZwYmt0a3pqa2hwYWx6YXVsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwNDQzNzYsImV4cCI6MjA5NjYyMDM3Nn0.W3QJ1C57bcg6Tltg1ycnEOVfSZA1dg0pTCDc7JSeSxU';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ─── PINS (change these or store in Supabase agents table) ────────────────────
+const PINS = { ryan:'Karabo2009', neo:'Karabo2009', mavis:'Karabo2009' };
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
   {id:'prospecting',label:'Prospecting',color:'#8fa3ba'},
   {id:'qualified',label:'Qualified',color:'#2d7dd2'},
@@ -408,74 +466,129 @@ const SHIP={
   delayed:{label:'Delayed',color:'#e85d3a',bg:'#fde8e3'}
 };
 const CARRIER_LABELS={
-  none:'—',
-  mok_national:'Mok Fleet · National',
-  mok_crossborder:'Mok Fleet · Cross-border',
-  JKJ:'JKJ · Local',
-  DHL:'DHL · Intl'
+  none:'—',mok_national:'Mok Fleet · National',mok_crossborder:'Mok Fleet · Cross-border',
+  JKJ:'JKJ · Local',DHL:'DHL · Intl'
 };
 const CARRIER_HELP={
-  mok_national:'🚛 Mok own fleet — 8 Tonne to Superlink. Book via booking.moktransports.com for national routes (JHB, CPT, DBN, PE and all major SA cities).',
-  mok_crossborder:'🚛 Mok own fleet — Cross-border routes: Zimbabwe, Zambia, Mozambique, Botswana, Namibia. Book via booking.moktransports.com.',
-  JKJ:'📦 JKJ handles local/domestic shipments. Client books via booking.moktransports.com — Mok coordinates the booking on their behalf.',
-  DHL:'✈️ DHL handles international exports and imports. Client books via booking.moktransports.com — ideal for cross-continental and air freight.'
+  mok_national:'🚛 Mok own fleet — 8T to Superlink. National routes (JHB, CPT, DBN, PE and all major SA cities). Book via booking.moktransports.com.',
+  mok_crossborder:'🚛 Mok own fleet — Cross-border: Zimbabwe, Zambia, Mozambique, Botswana, Namibia. Book via booking.moktransports.com.',
+  JKJ:'📦 JKJ local/domestic shipments. Client books via booking.moktransports.com.',
+  DHL:'✈️ DHL international exports & imports. Client books via booking.moktransports.com.'
 };
 function updateShipHelp(val){
   const row=document.getElementById('ship-help-row');
   const box=document.getElementById('ship-help');
-  if(val&&val!=='none'&&CARRIER_HELP[val]){
-    box.textContent=CARRIER_HELP[val];
-    row.style.display='block';
-  } else {
-    row.style.display='none';
-  }
+  if(val&&val!=='none'&&CARRIER_HELP[val]){box.textContent=CARRIER_HELP[val];row.style.display='block';}
+  else{row.style.display='none';}
 }
-const LOGS={
-  Neo:[
-    'Checkers Fleet discovery call completed — very interested',
-    'SA Breweries DHL quote sent — awaiting approval',
-    'Onboarded onto JKJ booking system — first booking done',
-    'Cold-called 6 new prospects in Ekurhuleni'
-  ],
-  Mavis:[
-    'Eskom Logistics cold call — follow-up scheduled',
-    'Sasol Chemicals shipment booked via JKJ',
-    'Joined route consolidation sales training',
-    'Sent intro deck to 3 new prospects in Midrand'
-  ]
-};
-let deals=[];
-let nid=1;
-let currentRole=null;
-let currentFilter='all';
 
-// ─── AUTH ────────────────────────────────────────────────────────────────────
-function selectRole(r){
-  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById('role-'+r).classList.add('selected');
-  currentRole=r;
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let deals=[], activityLogs={}, currentRole=null, currentFilter='all', logTargetAgent=null;
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+(type||'');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.className='',2800);
 }
-function doLogin(){
-  if(!currentRole){alert('Please select a profile.');return;}
+
+// ─── FORMAT ───────────────────────────────────────────────────────────────────
+function fmt(v){return'R '+Math.round(v||0).toLocaleString('en-ZA')}
+function fmtDate(d){return new Date(d).toLocaleDateString('en-ZA',{day:'numeric',month:'short'})}
+
+// ─── SUPABASE QUERIES ─────────────────────────────────────────────────────────
+async function loadDeals(){
+  const{data,error}=await sb.from('deals').select('*').order('created_at',{ascending:false});
+  if(error){toast('Could not load deals: '+error.message,'error');return;}
+  deals=data.map(d=>({...d,won:d.stage===4}));
+}
+async function loadLogs(){
+  const{data,error}=await sb.from('activity_log').select('*').order('created_at',{ascending:false});
+  if(error)return;
+  activityLogs={};
+  data.forEach(l=>{
+    const a=l.agent_name||l.agent;
+    if(!activityLogs[a])activityLogs[a]=[];
+    activityLogs[a].push(l.note+' · '+fmtDate(l.created_at));
+  });
+}
+async function saveDealToDB(deal){
+  const{data,error}=await sb.from('deals').insert([{
+    company:deal.company,value:deal.value,agent_name:deal.agent,
+    stage:deal.stage,carrier:deal.carrier,ship_status:deal.ship,
+    notes:deal.notes||''
+  }]).select().single();
+  if(error){toast('Error saving deal: '+error.message,'error');return null;}
+  toast('Deal saved ✓','success');
+  return data;
+}
+async function updateDealStage(id,stage){
+  const{error}=await sb.from('deals').update({stage,won:stage===4}).eq('id',id);
+  if(error){toast('Error updating deal','error');return false;}
+  toast('Deal moved ✓','success');
+  return true;
+}
+async function saveActivityToDB(agentName,note,dealId=null){
+  const{error}=await sb.from('activity_log').insert([{
+    agent_name:agentName,note,deal_id:dealId||null
+  }]);
+  if(error){toast('Error saving activity','error');return false;}
+  toast('Activity logged ✓','success');
+  return true;
+}
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.lf-pin').forEach((pin,i,pins)=>{
+  pin.addEventListener('input',e=>{
+    e.target.value=e.target.value.replace(/[^0-9]/g,'');
+    if(e.target.value&&i<pins.length-1)pins[i+1].focus();
+  });
+  pin.addEventListener('keydown',e=>{
+    if(e.key==='Backspace'&&!e.target.value&&i>0)pins[i-1].focus();
+    if(e.key==='Enter')doLogin();
+  });
+});
+function getPin(){return['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');}
+function showError(msg){const e=document.getElementById('lf-error');e.textContent=msg;e.classList.add('show');}
+function clearError(){document.getElementById('lf-error').classList.remove('show');}
+
+async function doLogin(){
+  clearError();
+  const profile=document.getElementById('lf-profile').value;
+  const pin=getPin();
+  if(!profile){showError('Please select your profile.');return;}
+  if(pin.length<4){showError('Please enter your 4-digit PIN.');return;}
+  if(PINS[profile]&&pin!==PINS[profile]){showError('Incorrect PIN. Please try again.');['pin1','pin2','pin3','pin4'].forEach(id=>document.getElementById(id).value='');document.getElementById('pin1').focus();return;}
+  const btn=document.getElementById('lf-btn');
+  btn.disabled=true;btn.innerHTML='<span class="lf-loading"></span>Signing in...';
+  await loadDeals();
+  await loadLogs();
+  currentRole=profile;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
+  document.getElementById('app').style.flexDirection='column';
   setupApp();
+  btn.disabled=false;btn.textContent='Sign in to pipeline';
 }
 function logout(){
-  currentRole=null;currentFilter='all';
-  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected'));
+  currentRole=null;currentFilter='all';deals=[];activityLogs={};
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
+  ['pin1','pin2','pin3','pin4'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('lf-profile').value='';
+  clearError();
+  document.querySelectorAll('.tb-tab').forEach(t=>t.remove());
+  document.querySelectorAll('.add-deal-btn').forEach(b=>b.remove());
 }
 
-// ─── APP SETUP ───────────────────────────────────────────────────────────────
+// ─── APP SETUP ────────────────────────────────────────────────────────────────
 function setupApp(){
   const nav=document.getElementById('tb-nav');
   const av=document.getElementById('tb-avatar');
   const un=document.getElementById('tb-username');
   nav.innerHTML='';
-
-  if(currentRole==='owner'){
+  document.querySelectorAll('.add-deal-btn').forEach(b=>b.remove());
+  if(currentRole==='ryan'){
     av.style.background='#2d7dd2';av.textContent='RM';
     un.textContent='Ryan Mokgethi';
     const tabs=[
@@ -489,25 +602,21 @@ function setupApp(){
       const btn=document.createElement('button');
       btn.className='tb-tab'+(i===0?' active':'');
       btn.textContent=t.label;
-      if(i===0){const b=document.createElement('span');b.className='owner-badge';b.textContent='Ryan Mokgethi';btn.appendChild(b);}
+      if(i===0){const b=document.createElement('span');b.className='owner-badge';b.textContent='Owner';btn.appendChild(b);}
       btn.onclick=()=>switchView(t.id,btn);
       nav.appendChild(btn);
     });
-    // Add deal btn
-    const ab=document.createElement('button');
-    ab.className='add-deal-btn';ab.textContent='+ New deal';
-    ab.onclick=openModal;
-    document.querySelector('.tb-right').insertBefore(ab,document.querySelector('.tb-user'));
+    addDealBtn();
     switchView('dashboard',nav.querySelector('.tb-tab'));
   } else {
-    const a=AGENTS[currentRole==='neo'?'Neo':'Mavis'];
     const name=currentRole==='neo'?'Neo':'Mavis';
+    const a=AGENTS[name];
     av.style.background=a.color;av.textContent=a.lbl;
     un.textContent=a.full;
     const tabs=[
       {id:'mydeals',label:'My deals'},
       {id:'carriers',label:'Carriers'},
-      {id:'tips',label:'My tips'}
+      {id:'tips',label:'Tips'}
     ];
     tabs.forEach((t,i)=>{
       const btn=document.createElement('button');
@@ -516,13 +625,19 @@ function setupApp(){
       btn.onclick=()=>switchView(t.id,btn);
       nav.appendChild(btn);
     });
-    const ab=document.createElement('button');
-    ab.className='add-deal-btn';ab.textContent='+ Add deal';
-    ab.onclick=openModal;
-    document.querySelector('.tb-right').insertBefore(ab,document.querySelector('.tb-user'));
+    addDealBtn();
+    // Lock agent field to own name
+    const agentWrap=document.getElementById('f-agent-wrap');
+    if(agentWrap)agentWrap.style.display='none';
     switchView('mydeals',nav.querySelector('.tb-tab'));
   }
   renderAll();
+}
+function addDealBtn(){
+  const ab=document.createElement('button');
+  ab.className='add-deal-btn';ab.textContent='+ New deal';
+  ab.onclick=openModal;
+  document.querySelector('.tb-right').insertBefore(ab,document.querySelector('.tb-user'));
 }
 
 function switchView(name,btn){
@@ -537,23 +652,20 @@ function switchView(name,btn){
   else if(name==='carriers')renderCarriers();
   else if(name==='tips')renderTips();
 }
-
 function renderAll(){
-  renderStats();
-  if(currentRole==='owner'){renderDashboard();renderAgents();}
+  if(currentRole==='ryan'){renderDashboard();renderAgents();}
   else{renderMyDeals();}
   renderCarriers();renderTips();
 }
 
-// ─── STATS ───────────────────────────────────────────────────────────────────
-function fmt(v){return'R '+Math.round(v).toLocaleString('en-ZA')}
-function renderStats(targetEl='stats-row',filterAgent=null){
-  const d=filterAgent?deals.filter(x=>x.agent===filterAgent):deals;
+// ─── STATS ────────────────────────────────────────────────────────────────────
+function renderStats(targetEl,filterAgent){
+  const d=filterAgent?deals.filter(x=>x.agent_name===filterAgent||x.agent===filterAgent):deals;
   const open=d.filter(x=>!x.won);
   const won=d.filter(x=>x.won);
-  const pipe=open.reduce((s,x)=>s+x.value,0);
-  const wonV=won.reduce((s,x)=>s+x.value,0);
-  const live=d.filter(x=>x.ship==='in_transit'||x.ship==='booked').length;
+  const pipe=open.reduce((s,x)=>s+(x.value||0),0);
+  const wonV=won.reduce((s,x)=>s+(x.value||0),0);
+  const live=d.filter(x=>x.ship_status==='in_transit'||x.ship_status==='booked'||x.ship==='in_transit'||x.ship==='booked').length;
   const el=document.getElementById(targetEl);
   if(!el)return;
   el.innerHTML=`
@@ -563,7 +675,7 @@ function renderStats(targetEl='stats-row',filterAgent=null){
     <div class="stat-card coral"><div class="stat-label">Live shipments</div><div class="stat-value">${live}</div><div class="stat-sub">JKJ + DHL active</div></div>`;
 }
 
-// ─── PIPELINE ────────────────────────────────────────────────────────────────
+// ─── PIPELINE ─────────────────────────────────────────────────────────────────
 function renderPipeline(){
   renderStats('stats-row');
   const fr=document.getElementById('filters-row');
@@ -584,12 +696,16 @@ function renderMyDeals(){
   renderStats('my-stats-row',name);
   renderKanban('my-kanban-board',name);
 }
+function getAgent(d){return d.agent_name||d.agent||''}
+function getShip(d){return d.ship_status||d.ship||'none'}
+function getCarrier(d){return d.carrier||'none'}
+
 function renderKanban(boardId,agentFilter){
   const board=document.getElementById(boardId);
   if(!board)return;
   board.innerHTML='';
   STAGES.forEach((st,si)=>{
-    const fds=deals.filter(d=>d.stage===si&&(!agentFilter||d.agent===agentFilter));
+    const fds=deals.filter(d=>d.stage===si&&(!agentFilter||(getAgent(d)===agentFilter)));
     const col=document.createElement('div');
     col.className='k-col';
     col.innerHTML=`<div class="k-col-hd"><span><span class="k-dot" style="background:${st.color}"></span>${st.label}</span><span class="k-cnt">${fds.length}</span></div><div class="k-cards" id="${boardId}-c${si}"></div>`;
@@ -597,45 +713,50 @@ function renderKanban(boardId,agentFilter){
     const cc=col.querySelector('.k-cards');
     if(!fds.length){cc.innerHTML='<div class="empty-col">No deals</div>';return;}
     fds.forEach(d=>{
-      const a=AGENTS[d.agent];
-      const ss=SHIP[d.ship||'none'];
+      const agentName=getAgent(d);
+      const a=AGENTS[agentName]||{color:'#8fa3ba',bg:'#eef1f7',lbl:'??'};
+      const shipKey=getShip(d);
+      const ss=SHIP[shipKey]||SHIP.none;
+      const carrierKey=getCarrier(d);
       const card=document.createElement('div');
       card.className='deal-card';
-      const shipRow=d.ship&&d.ship!=='none'?`<div class="ship-row"><div class="ship-pill" style="background:${ss.bg};color:${ss.color}"><div class="ship-dot" style="background:${ss.color}"></div>${CARRIER_LABELS[d.carrier]||d.carrier} · ${ss.label}</div></div>`:'';
-      card.innerHTML=`<div class="move-hint">Click to advance →</div><div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${d.agent}</span><span class="deal-date">${d.date}</span></div>${shipRow}`;
+      const shipRow=shipKey&&shipKey!=='none'?`<div class="ship-row"><div class="ship-pill" style="background:${ss.bg};color:${ss.color}"><div class="ship-dot" style="background:${ss.color}"></div>${CARRIER_LABELS[carrierKey]||carrierKey} · ${ss.label}</div></div>`:'';
+      card.innerHTML=`<div class="move-hint">click to advance →</div><div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}`;
       if(d.notes)card.title=d.notes;
       card.onclick=()=>advanceDeal(d,boardId,agentFilter);
       cc.appendChild(card);
     });
   });
 }
-function advanceDeal(d,boardId,af){
-  if(d.stage>=4){alert(`"${d.company}" is already closed won.`);return;}
+
+async function advanceDeal(d,boardId,af){
+  if(d.stage>=4){toast('Deal is already closed won.');return;}
   const next=STAGES[d.stage+1].label;
-  if(confirm(`Move "${d.company}" to "${next}"?`)){
-    d.stage++;d.won=(d.stage===4);
-    renderKanban(boardId,af);
-    renderStats(boardId==='my-kanban-board'?'my-stats-row':'stats-row',af);
-    if(currentRole==='owner'){renderDashboard();renderAgents();}
-  }
+  if(!confirm('Move "'+d.company+'" to "'+next+'"?'))return;
+  const ok=await updateDealStage(d.id,d.stage+1);
+  if(!ok)return;
+  d.stage++;d.won=(d.stage===4);
+  renderKanban(boardId,af);
+  renderStats(boardId==='my-kanban-board'?'my-stats-row':'stats-row',af);
+  if(currentRole==='ryan'){renderDashboard();renderAgents();}
 }
 
-// ─── AGENTS ──────────────────────────────────────────────────────────────────
+// ─── AGENTS ───────────────────────────────────────────────────────────────────
 function renderAgents(){
   const grid=document.getElementById('agent-cards');
   if(!grid)return;
   grid.innerHTML='';
   ['Neo','Mavis'].forEach(name=>{
     const a=AGENTS[name];
-    const myD=deals.filter(d=>d.agent===name);
+    const myD=deals.filter(d=>getAgent(d)===name);
     const open=myD.filter(d=>!d.won);
     const won=myD.filter(d=>d.won);
-    const wonV=won.reduce((s,d)=>s+d.value,0);
-    const pipe=open.reduce((s,d)=>s+d.value,0);
+    const wonV=won.reduce((s,d)=>s+(d.value||0),0);
+    const pipe=open.reduce((s,d)=>s+(d.value||0),0);
     const wr=myD.length?Math.round(won.length/myD.length*100):0;
     const tgtPct=Math.min(100,Math.round(wonV/a.target*100));
     const barC=tgtPct>=70?'#1aaf82':tgtPct>=35?'#f5a623':'#e85d3a';
-    const logs=LOGS[name]||[];
+    const logs=activityLogs[name]||[];
     const card=document.createElement('div');
     card.className='a-card';
     card.innerHTML=`
@@ -644,97 +765,95 @@ function renderAgents(){
         <div><div class="a-name">${a.full}</div><div class="a-role">Operations &amp; Sales · Mok Transports Services</div></div>
       </div>
       <div class="a-stats">
-        <div class="a-stat"><div class="a-stat-v">${open.length}</div><div class="a-stat-l">Open deals</div></div>
+        <div class="a-stat"><div class="a-stat-v">${open.length}</div><div class="a-stat-l">Open</div></div>
         <div class="a-stat"><div class="a-stat-v">${wr}%</div><div class="a-stat-l">Win rate</div></div>
         <div class="a-stat"><div class="a-stat-v">${fmt(pipe).replace('R ','R')}</div><div class="a-stat-l">Pipeline</div></div>
       </div>
       <div class="target-wrap">
-        <div class="target-labels"><span>Monthly target progress</span><span>${fmt(wonV)} / ${fmt(a.target)}</span></div>
+        <div class="target-labels"><span>Monthly target</span><span>${fmt(wonV)} / ${fmt(a.target)}</span></div>
         <div class="prog-bg"><div class="prog-fill" style="width:${tgtPct}%;background:${barC}"></div></div>
       </div>
-      <div class="activity-title">Recent activity <button class="log-btn" onclick="logAct('${name}')">+ Log</button></div>
-      <div class="act-list" id="act-${name}">
-        ${logs.map(l=>`<div class="act-item"><span class="act-dot" style="background:${a.color}"></span><span>${l}</span></div>`).join('')}
+      <div class="activity-title">Recent activity
+        <button class="log-btn" onclick="openLogModal('${name}')">+ Log</button>
+      </div>
+      <div class="act-list">
+        ${logs.length?logs.slice(0,5).map(l=>`<div class="act-item"><span class="act-dot" style="background:${a.color}"></span><span>${l}</span></div>`).join(''):'<div class="act-item" style="color:var(--text3);font-style:italic">No activity logged yet</div>'}
       </div>`;
     grid.appendChild(card);
   });
 }
-function logAct(name){
-  const txt=prompt(`Log activity for ${name}:`);
-  if(txt&&txt.trim()){
-    LOGS[name]=(LOGS[name]||[]);
-    LOGS[name].unshift(txt.trim());
+function openLogModal(name){
+  logTargetAgent=name;
+  document.getElementById('log-modal-title').textContent='Log activity — '+name;
+  document.getElementById('log-note').value='';
+  document.getElementById('log-modal').classList.add('open');
+}
+async function saveLog(){
+  const note=document.getElementById('log-note').value.trim();
+  if(!note){toast('Please enter a note.','error');return;}
+  const btn=document.getElementById('save-log-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  const ok=await saveActivityToDB(logTargetAgent,note);
+  btn.disabled=false;btn.textContent='Save';
+  if(ok){
+    document.getElementById('log-modal').classList.remove('open');
+    await loadLogs();
     renderAgents();
   }
 }
 
-// ─── DASHBOARD ───────────────────────────────────────────────────────────────
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function renderDashboard(){
   const el=document.getElementById('dashboard-content');
   if(!el)return;
-  const total=deals.reduce((s,d)=>s+d.value,0);
   const open=deals.filter(d=>!d.won);
   const won=deals.filter(d=>d.won);
-  const pipe=open.reduce((s,d)=>s+d.value,0);
-  const wonV=won.reduce((s,d)=>s+d.value,0);
-  const live=deals.filter(d=>d.ship==='in_transit'||d.ship==='booked').length;
-
-  function agentStats(name){
-    const a=AGENTS[name];
-    const md=deals.filter(d=>d.agent===name);
-    const ow=md.filter(d=>!d.won);
-    const wn=md.filter(d=>d.won);
-    return{
-      deals:md.length,open:ow.length,won:wn.length,
-      pipe:ow.reduce((s,d)=>s+d.value,0),
-      wonV:wn.reduce((s,d)=>s+d.value,0),
+  const pipe=open.reduce((s,d)=>s+(d.value||0),0);
+  const wonV=won.reduce((s,d)=>s+(d.value||0),0);
+  const live=deals.filter(d=>['in_transit','booked'].includes(getShip(d))).length;
+  function as(name){
+    const md=deals.filter(d=>getAgent(d)===name);
+    const ow=md.filter(d=>!d.won),wn=md.filter(d=>d.won);
+    const wv=wn.reduce((s,d)=>s+(d.value||0),0);
+    return{deals:md.length,open:ow.length,won:wn.length,
+      pipe:ow.reduce((s,d)=>s+(d.value||0),0),wonV:wv,
       wr:md.length?Math.round(wn.length/md.length*100):0,
-      tgtPct:Math.min(100,Math.round(wn.reduce((s,d)=>s+d.value,0)/a.target*100))
-    };
+      tgtPct:Math.min(100,Math.round(wv/AGENTS[name].target*100))};
   }
-  const ns=agentStats('Neo'),ms=agentStats('Mavis');
-  const leader=ns.wonV>=ms.wonV?'Neo':'Mavis';
-
-  // Stage counts
+  const ns=as('Neo'),ms=as('Mavis');
   const stageCounts=STAGES.map((_,i)=>deals.filter(d=>d.stage===i).length);
-  const maxStage=Math.max(...stageCounts,1);
-
   el.innerHTML=`
   <div class="stats-row" style="margin-bottom:14px">
-    <div class="stat-card blue"><div class="stat-label">Total pipeline</div><div class="stat-value">${fmt(pipe)}</div><div class="stat-sub">${open.length} open deals</div></div>
+    <div class="stat-card blue"><div class="stat-label">Total pipeline</div><div class="stat-value">${fmt(pipe)}</div><div class="stat-sub">${open.length} open</div></div>
     <div class="stat-card teal"><div class="stat-label">Won this month</div><div class="stat-value">${fmt(wonV)}</div><div class="stat-sub">${won.length} closed</div></div>
-    <div class="stat-card amber"><div class="stat-label">All deals</div><div class="stat-value">${deals.length}</div><div class="stat-sub">across both agents</div></div>
+    <div class="stat-card amber"><div class="stat-label">All deals</div><div class="stat-value">${deals.length}</div><div class="stat-sub">both agents</div></div>
     <div class="stat-card coral"><div class="stat-label">Live shipments</div><div class="stat-value">${live}</div><div class="stat-sub">JKJ + DHL</div></div>
   </div>
   <div class="dash-grid">
     <div class="dash-card">
-      <div class="dash-card-title">Agent leaderboard</div>
+      <div class="dash-card-title">Leaderboard</div>
       <div class="leaderboard">
         ${[['Neo',ns],['Mavis',ms]].sort((a,b)=>b[1].wonV-a[1].wonV).map(([nm,s],i)=>{
-          const a=AGENTS[nm];
-          const maxV=Math.max(ns.wonV,ms.wonV,1);
-          const barW=Math.round(s.wonV/maxV*100);
-          const barC=s.wonV>=s.wonV?a.color:'#8fa3ba';
+          const a=AGENTS[nm];const maxV=Math.max(ns.wonV,ms.wonV,1);
           return`<div class="lb-row">
             <div class="lb-rank">#${i+1}</div>
             <div class="lb-avatar" style="background:${a.bg};color:${a.color}">${a.lbl}</div>
-            <div class="lb-info"><div class="lb-name">${nm} ${nm==='Neo'?'Lumkwana':'Selomana'}</div><div class="lb-meta">${s.won} won · ${s.open} open · ${s.wr}% win rate</div></div>
-            <div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${barW}%;background:${a.color}"></div></div></div>
+            <div class="lb-info"><div class="lb-name">${a.full}</div><div class="lb-meta">${s.won} won · ${s.open} open · ${s.wr}% win rate</div></div>
+            <div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:${Math.round(s.wonV/maxV*100)}%;background:${a.color}"></div></div></div>
             <div class="lb-value">${fmt(s.wonV)}</div>
           </div>`;
         }).join('')}
       </div>
     </div>
     <div class="dash-card">
-      <div class="dash-card-title">Deals by stage</div>
+      <div class="dash-card-title">Pipeline by stage</div>
       <div class="pipeline-stage-row">
         ${STAGES.map((st,i)=>{
           const cnt=stageCounts[i];
-          const val=deals.filter(d=>d.stage===i).reduce((s,d)=>s+d.value,0);
-          const w=Math.round(cnt/Math.max(deals.length,1)*100);
+          const val=deals.filter(d=>d.stage===i).reduce((s,d)=>s+(d.value||0),0);
           return`<div class="ps-row">
             <div class="ps-label">${st.label}</div>
-            <div class="ps-bar-bg"><div class="ps-bar-fill" style="width:${w}%;background:${st.color}"></div></div>
+            <div class="ps-bar-bg"><div class="ps-bar-fill" style="width:${Math.round(cnt/Math.max(deals.length,1)*100)}%;background:${st.color}"></div></div>
             <div class="ps-count">${cnt}</div>
             <div class="ps-value">${fmt(val)}</div>
           </div>`;
@@ -744,8 +863,7 @@ function renderDashboard(){
     <div class="dash-card">
       <div class="dash-card-title">Target progress</div>
       ${['Neo','Mavis'].map(nm=>{
-        const a=AGENTS[nm];
-        const s=nm==='Neo'?ns:ms;
+        const a=AGENTS[nm];const s=nm==='Neo'?ns:ms;
         const bc=s.tgtPct>=70?'#1aaf82':s.tgtPct>=35?'#f5a623':'#e85d3a';
         return`<div style="margin-bottom:14px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
@@ -759,20 +877,13 @@ function renderDashboard(){
       }).join('')}
     </div>
     <div class="dash-card wide">
-      <div class="dash-card-title">Head-to-head comparison</div>
-      <div style="display:grid;grid-template-columns:1fr 80px 80px;gap:0;margin-bottom:6px">
+      <div class="dash-card-title">Head-to-head</div>
+      <div style="display:grid;grid-template-columns:1fr 80px 80px;margin-bottom:6px">
         <div></div>
         ${['Neo','Mavis'].map(nm=>{const a=AGENTS[nm];return`<div style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:${a.bg};color:${a.color}">${nm}</span></div>`}).join('')}
       </div>
-      ${[
-        ['Open deals',ns.open,ms.open,false],
-        ['Won deals',ns.won,ms.won,false],
-        ['Pipeline value',fmt(ns.pipe),fmt(ms.pipe),false],
-        ['Won value',fmt(ns.wonV),fmt(ms.wonV),false],
-        ['Win rate',ns.wr+'%',ms.wr+'%',false],
-        ['Total deals',ns.deals,ms.deals,false]
-      ].map(([lbl,nv,mv])=>`
-        <div style="display:grid;grid-template-columns:1fr 80px 80px;padding:7px 0;border-bottom:1px solid var(--border)">
+      ${[['Open deals',ns.open,ms.open],['Won deals',ns.won,ms.won],['Pipeline value',fmt(ns.pipe),fmt(ms.pipe)],['Won value',fmt(ns.wonV),fmt(ms.wonV)],['Win rate',ns.wr+'%',ms.wr+'%'],['Total deals',ns.deals,ms.deals]]
+        .map(([lbl,nv,mv])=>`<div style="display:grid;grid-template-columns:1fr 80px 80px;padding:7px 0;border-bottom:1px solid var(--border)">
           <div style="font-size:11px;color:var(--text2)">${lbl}</div>
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Neo.color};text-align:center;font-family:'DM Mono',monospace">${nv}</div>
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Mavis.color};text-align:center;font-family:'DM Mono',monospace">${mv}</div>
@@ -783,185 +894,88 @@ function renderDashboard(){
       <div class="alerts-list">
         <div class="alert-item ${ns.tgtPct<30||ms.tgtPct<30?'warn':'good'}">
           <div><div class="alert-title">${ns.tgtPct<30||ms.tgtPct<30?'Agents below 30% of target':'Both agents on track'}</div>
-          <div class="alert-body">${ns.tgtPct<30?'Neo is at '+ns.tgtPct+'% of their monthly target. ':''}${ms.tgtPct<30?'Mavis is at '+ms.tgtPct+'% of their monthly target.':''} ${ns.tgtPct>=30&&ms.tgtPct>=30?'Both Neo and Mavis are progressing well toward their R 200k targets.':''}</div></div>
+          <div class="alert-body">${ns.tgtPct<30?'Neo is at '+ns.tgtPct+'%. ':''} ${ms.tgtPct<30?'Mavis is at '+ms.tgtPct+'%. ':''} ${ns.tgtPct>=30&&ms.tgtPct>=30?'Both Neo and Mavis are progressing toward their R 200k targets.':''}</div></div>
         </div>
         <div class="alert-item info">
           <div><div class="alert-title">${deals.filter(d=>d.stage===3).length} deal(s) in negotiation</div>
-          <div class="alert-body">${deals.filter(d=>d.stage===3).map(d=>d.company).join(', ')||'None'} — consider joining the call to help close.</div></div>
+          <div class="alert-body">${deals.filter(d=>d.stage===3).map(d=>d.company).join(', ')||'None currently'}</div></div>
         </div>
         <div class="alert-item ${live>0?'good':'warn'}">
-          <div><div class="alert-title">${live} live shipment(s) in progress</div>
-          <div class="alert-body">${live>0?'Active JKJ/DHL shipments are running. Share tracking links with clients to build trust.':'No active shipments. Encourage agents to book shipments for qualified clients.'}</div></div>
+          <div><div class="alert-title">${live} live shipment(s)</div>
+          <div class="alert-body">${live>0?'Active JKJ/DHL shipments running. Share tracking links with clients.':'No active shipments. Encourage agents to book shipments for qualified leads.'}</div></div>
         </div>
       </div>
     </div>
   </div>`;
 }
 
-// ─── CARRIERS ────────────────────────────────────────────────────────────────
+// ─── CARRIERS ─────────────────────────────────────────────────────────────────
 function renderCarriers(){
   const el=document.getElementById('carriers-content');
   if(!el)return;
-  const mokNat=deals.filter(d=>d.carrier==='mok_national').length;
-  const mokCross=deals.filter(d=>d.carrier==='mok_crossborder').length;
-  const jkjD=deals.filter(d=>d.carrier==='JKJ').length;
-  const dhlD=deals.filter(d=>d.carrier==='DHL').length;
+  const mokNat=deals.filter(d=>getCarrier(d)==='mok_national').length;
+  const mokCross=deals.filter(d=>getCarrier(d)==='mok_crossborder').length;
+  const jkjD=deals.filter(d=>getCarrier(d)==='JKJ').length;
+  const dhlD=deals.filter(d=>getCarrier(d)==='DHL').length;
   el.innerHTML=`
-    <!-- PLATFORM BANNER -->
     <div style="background:linear-gradient(135deg,#0d1f35 0%,#1e3a5f 100%);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
       <div>
         <div style="color:#fff;font-size:15px;font-weight:700;margin-bottom:4px">🌐 booking.moktransports.com</div>
-        <div style="color:rgba(255,255,255,0.55);font-size:12px;line-height:1.6;max-width:560px">
-          Mok Transports Services' own shipment booking platform. Clients can book <strong style="color:rgba(255,255,255,0.8)">local shipments via JKJ</strong>, 
-          <strong style="color:rgba(255,255,255,0.8)">international exports &amp; imports via DHL</strong>, 
-          and <strong style="color:rgba(255,255,255,0.8)">national &amp; cross-border hauls using Mok Transports Services' own fleet</strong> — all from one place.
-        </div>
+        <div style="color:rgba(255,255,255,0.5);font-size:12px;line-height:1.6;max-width:560px">One platform for local (JKJ), international exports &amp; imports (DHL), and Mok Transports Services' own fleet — national and cross-border.</div>
       </div>
-      <a href="https://booking.moktransports.com" target="_blank" style="padding:10px 20px;background:#2d7dd2;color:#fff;border-radius:var(--radius-sm);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0">Open booking platform ↗</a>
+      <a href="https://booking.moktransports.com" target="_blank" style="padding:10px 20px;background:#2d7dd2;color:#fff;border-radius:var(--radius-sm);font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">Open platform ↗</a>
     </div>
-
-    <!-- WHAT TO BOOK WHERE -->
-    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px">
       ${[
-        {icon:'🚛',title:'National delivery',sub:'Mok own fleet',color:'#1aaf82',bg:'#d6f5ec',
-         desc:'8 Tonne to Superlink trucks. All major SA cities — JHB, CPT, DBN, PE, BFN, EL.',
-         how:'Book at booking.moktransports.com → National routes',
-         deals:mokNat},
-        {icon:'🛣️',title:'Cross-border delivery',sub:'Mok own fleet',color:'#534ab7',bg:'#ede9f8',
-         desc:'Zimbabwe, Zambia, Mozambique, Botswana, Namibia and beyond. Own fleet, SADC compliant.',
-         how:'Book at booking.moktransports.com → Cross-border routes',
-         deals:mokCross},
-        {icon:'📦',title:'Local courier',sub:'Via JKJ partner',color:'#2d7dd2',bg:'#ddeeff',
-         desc:'Domestic parcel and pallet delivery anywhere in South Africa. Fast and cost-effective.',
-         how:'Book at booking.moktransports.com → Local shipments (JKJ)',
-         deals:jkjD},
-      ].map(s=>`
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <div style="width:36px;height:36px;background:${s.bg};border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px">${s.icon}</div>
-            <div><div style="font-size:13px;font-weight:600;color:var(--text)">${s.title}</div><div style="font-size:10px;color:var(--text3)">${s.sub}</div></div>
-          </div>
-          <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:8px">${s.desc}</div>
-          <div style="font-size:10px;color:${s.color};font-weight:600;background:${s.bg};padding:5px 8px;border-radius:6px;margin-bottom:8px">${s.how}</div>
-          <div style="font-size:10px;color:var(--text3)">${s.deals} active deal${s.deals!==1?'s':''}</div>
-        </div>`).join('')}
-    </div>
-
-    <!-- INTERNATIONAL -->
-    <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <div style="width:36px;height:36px;background:#fef3dc;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px">✈️</div>
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">International exports &amp; imports</div>
-          <div style="font-size:10px;color:var(--text3)">Via DHL partner — booked through Mok Transports Services' platform</div>
+        {icon:'🚛',title:'National delivery',sub:'Mok own fleet',color:'#1aaf82',bg:'#d6f5ec',desc:'8T to Superlink. All major SA cities.',how:'booking.moktransports.com → National',deals:mokNat},
+        {icon:'🛣️',title:'Cross-border',sub:'Mok own fleet',color:'#534ab7',bg:'#ede9f8',desc:'ZW, ZM, MZ, BW, NA and beyond.',how:'booking.moktransports.com → Cross-border',deals:mokCross},
+        {icon:'📦',title:'Local courier',sub:'Via JKJ',color:'#2d7dd2',bg:'#ddeeff',desc:'Domestic parcel and pallet delivery.',how:'booking.moktransports.com → Local (JKJ)',deals:jkjD},
+        {icon:'✈️',title:'International',sub:'Via DHL',color:'#9a6800',bg:'#fef3dc',desc:'Exports &amp; imports, 190+ countries.',how:'booking.moktransports.com → International',deals:dhlD},
+      ].map(s=>`<div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:34px;height:34px;background:${s.bg};border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px">${s.icon}</div>
+          <div><div style="font-size:12px;font-weight:600;color:var(--text)">${s.title}</div><div style="font-size:10px;color:var(--text3)">${s.sub}</div></div>
         </div>
-        <div style="margin-left:auto;font-size:10px;color:var(--text3)">${dhlD} active deals</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">
-        ${[{v:'97%',l:'On-time rate'},{v:'1.4 days',l:'Avg domestic transit'},{v:'3–5 days',l:'Intl air freight'},{v:'190+',l:'Countries covered'}]
-          .map(m=>`<div style="background:var(--off);border-radius:var(--radius-sm);padding:9px;text-align:center"><div style="font-size:14px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace">${m.v}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${m.l}</div></div>`).join('')}
-      </div>
-      <div style="font-size:11px;color:var(--text2);background:#fef3dc;border-radius:var(--radius-sm);padding:8px 10px;line-height:1.6">
-        <strong>How to book:</strong> Client visits <strong>booking.moktransports.com</strong> → International → select Export or Import → Mok coordinates the DHL booking and documentation.
-      </div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:7px">${s.desc}</div>
+        <div style="font-size:10px;color:${s.color};font-weight:600;background:${s.bg};padding:4px 8px;border-radius:6px;margin-bottom:6px">${s.how}</div>
+        <div style="font-size:10px;color:var(--text3)">${s.deals} active deal${s.deals!==1?'s':''}</div>
+      </div>`).join('')}
     </div>
-
-    <!-- FLEET SPECS -->
     <div style="background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px">
-      <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">🚛 Mok own fleet — truck types &amp; capacity</div>
+      <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">🚛 Mok fleet — truck types &amp; capacity</div>
       <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">
-        ${[
-          {truck:'8 Tonne',cap:'~60 cbm / 8 000 kg',use:'City deliveries, SME cargo, furniture',icon:'🚐'},
-          {truck:'10 Tonne',cap:'~80 cbm / 10 000 kg',use:'Regional FMCG, building materials',icon:'🚚'},
-          {truck:'14 Tonne',cap:'~100 cbm / 14 000 kg',use:'Retail stock, manufacturing output',icon:'🚛'},
-          {truck:'Superlink',cap:'~120 cbm / 34 000 kg',use:'Bulk haul, mining, cross-border',icon:'🛻'},
-        ].map(t=>`
-          <div style="background:var(--off);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border)">
-            <div style="font-size:22px;margin-bottom:6px">${t.icon}</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">${t.truck}</div>
-            <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">${t.cap}</div>
-            <div style="font-size:10px;color:var(--text3);line-height:1.4">${t.use}</div>
+        ${[{t:'8 Tonne',c:'~8 000 kg',u:'City deliveries, SME cargo',i:'🚐'},{t:'10 Tonne',c:'~10 000 kg',u:'Regional FMCG, building materials',i:'🚚'},{t:'14 Tonne',c:'~14 000 kg',u:'Retail stock, manufacturing',i:'🚛'},{t:'Superlink',c:'~34 000 kg',u:'Bulk haul, mining, cross-border',i:'🛻'}]
+          .map(x=>`<div style="background:var(--off);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border)">
+            <div style="font-size:20px;margin-bottom:6px">${x.i}</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px">${x.t}</div>
+            <div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:4px">${x.c}</div>
+            <div style="font-size:10px;color:var(--text3);line-height:1.4">${x.u}</div>
           </div>`).join('')}
-      </div>
-      <div style="margin-top:10px;font-size:11px;color:var(--text2);background:#d6f5ec;border-radius:var(--radius-sm);padding:8px 10px;line-height:1.6">
-        <strong>Sales tip:</strong> When a client asks "what size truck do I need?" — ask: <em>"How many pallets or cubic metres do you move per load, and how far?"</em> Then match to the truck above. Bigger loads on a Superlink = lower cost per km for the client.
       </div>
     </div>`;
 }
 
 // ─── TIPS ─────────────────────────────────────────────────────────────────────
 const TIPS_DATA=[
-  // PROSPECTING
-  {cat:'prospecting',catLabel:'Prospecting',catColor:'#2d7dd2',catBg:'#ddeeff',icon:'🎯',bg:'#ddeeff',
-   title:'Where to find logistics clients in SA',
-   body:'The best clients for Mok Transports are companies that move physical goods regularly. Focus on these sectors: FMCG (food, beverages, household goods), manufacturing, retail chains, construction, mining supply, and pharmaceutical distribution.',
-   steps:['Search Google Maps for "warehouses in [your area]" or "distribution centres Gauteng" — these are warm leads','Visit industrial parks in Germiston, Midrand, Isando, and Alrode — walk in and ask for the logistics or procurement manager','Check Gumtree and LinkedIn for companies advertising for "logistics coordinator" — they clearly have freight needs','Look at Yellowpages.co.za under Transport & Logistics and cross-reference with Google reviews to find active businesses']
-  },
-  {cat:'prospecting',catLabel:'Prospecting',catColor:'#2d7dd2',catBg:'#ddeeff',icon:'🏭',bg:'#ddeeff',
-   title:'Target industries that always need trucks',
-   body:'Some industries move freight every single day. Prioritise these for Mok\'s own fleet — they need reliable, dedicated transport partners.',
-   steps:['Retail chains (Shoprite, Pick n Pay, Spar independents) need daily store deliveries — pitch a dedicated truck contract','FMCG manufacturers (beverages, snacks, cleaning products) dispatch weekly to regional warehouses','Construction companies move materials to sites constantly — look for active building sites near you','Agricultural co-ops and food processors move seasonal bulk goods — time your pitch before harvest season (Jan–April, Jul–Sep)']
-  },
-  {cat:'prospecting',catLabel:'Prospecting',catColor:'#2d7dd2',catBg:'#ddeeff',icon:'🔍',bg:'#ddeeff',
-   title:'How to find clients online',
-   body:'Social media and online directories are free prospecting tools. Use them daily to build a list of warm leads for Mok Transports Services.',
-   steps:['LinkedIn: search "operations manager" or "supply chain manager" in Johannesburg — connect and send a short intro message','Facebook Groups: join "Johannesburg Business Network" or "SA SMME Groups" — businesses often post logistics needs','Bid or Tender portals: register on etenders.gov.za for government transport tenders — Mok\'s fleet can qualify','Trade directories: kompass.com/south-africa, bizcommunity.com list thousands of SA companies by industry — build your call list here']
-  },
-  // FLEET
-  {cat:'fleet',catLabel:'Own Fleet',catColor:'#1aaf82',catBg:'#d6f5ec',icon:'🚚',bg:'#d6f5ec',
-   title:'How to pitch Mok\'s own fleet — your biggest advantage',
-   body:'Unlike brokers who outsource everything, Mok Transports owns its trucks. This is your strongest selling point — lead with it. Clients pay less, get better service, and deal with one company end-to-end.',
-   steps:['Say: "We own our fleet — no middlemen, no markups, no surprises on your invoice"','Emphasise reliability: "Our drivers are our employees. We know where every truck is, every hour"','Offer flexibility: "We can dedicate a truck to your routes on a monthly contract so you always have capacity"','Mention accountability: "If there\'s a problem, you call us directly — not a call centre in another city"']
-  },
-  {cat:'fleet',catLabel:'Own Fleet',catColor:'#1aaf82',catBg:'#d6f5ec',icon:'📋',bg:'#d6f5ec',
-   title:'Dedicated truck contracts — the highest-value deal type',
-   body:'The most profitable and stable deal for Mok is a dedicated truck contract. One client, one truck, fixed monthly fee. Here\'s how to sell it.',
-   steps:['Ask the client: "How many deliveries do you make per week, and where?" — map their routes to Mok\'s capacity','If they dispatch 3+ times a week, a dedicated truck is cheaper for them than ad-hoc rates','Present it as a cost-saving: "A dedicated truck at R 35–50k/month vs paying R 1 500 per delivery 5x a week = you save money"','Include a free first-week trial with Mok\'s truck — this almost always converts to a signed contract']
-  },
-  {cat:'fleet',catLabel:'Own Fleet',catColor:'#1aaf82',catBg:'#d6f5ec',icon:'🗺️',bg:'#d6f5ec',
-   title:'Winning clients with a route audit',
-   body:'Offer a free "route audit" — review a client\'s current logistics spend and show where Mok\'s fleet saves them money. It opens the door without feeling like a hard sell.',
-   steps:['Ask for 3 months of their courier/transport invoices — most clients overspend by 15–30%','Map their delivery routes and show consolidation opportunities using Mok\'s trucks','Present a side-by-side comparison: "Current spend vs Mok contract" with Rand savings highlighted','Close with: "We can start a pilot route next week at no risk — if you\'re not satisfied, you don\'t pay"']
-  },
-  // COLD CALLING
-  {cat:'coldcall',catLabel:'Cold Calling',catColor:'#f5a623',catBg:'#fef3dc',icon:'📞',bg:'#fef3dc',
-   title:'Cold call script for logistics sales',
-   body:'A good cold call lasts 90 seconds and ends with a meeting booked, not a sale. Use this script for Mok Transports Services.',
-   steps:['"Hi, I\'m [Name] from Mok Transports — we\'re a local fleet owner based in [area]. Who handles your transport and logistics?"','Once connected: "We work with companies like yours to reduce freight costs using our own trucks. Do you currently use third-party couriers?"','If yes: "We\'ve helped similar businesses save 20–30% by switching to a direct fleet contract. Would you be open to a 15-minute chat this week?"','If they hesitate: "I can send you a quick comparison — what\'s your email? No obligation at all."']
-  },
-  {cat:'coldcall',catLabel:'Cold Calling',catColor:'#f5a623',catBg:'#fef3dc',icon:'⏰',bg:'#fef3dc',
-   title:'Best times and days to call prospects',
-   body:'Timing your calls correctly doubles your connect rate. Logistics managers are most reachable outside of dispatch windows.',
-   steps:['Best days: Tuesday, Wednesday, Thursday — Monday is chaotic, Friday people are winding down','Best times: 8:00–9:30am (before the day gets busy) and 2:00–4:00pm (after lunch, before end-of-day)','Avoid: Monday mornings, Friday afternoons, and the first week of the month (month-end madness in logistics)','Send a WhatsApp after a missed call: "Hi [Name], Neo from Mok Transports — tried to reach you. Happy to chat about reducing your fleet costs. Convenient time?" — this gets 3x more replies than voicemail']
-  },
-  {cat:'coldcall',catLabel:'Cold Calling',catColor:'#f5a623',catBg:'#fef3dc',icon:'💬',bg:'#fef3dc',
-   title:'Handling common objections',
-   body:'Every logistics sales call faces the same objections. Know these answers cold.',
-   steps:['"We already have a supplier" → "Great — most of our clients had one too. We don\'t ask you to switch everything, just let us quote on one route and you can compare yourself"','"We\'re happy with what we have" → "Understood. Can I ask — when last did you benchmark your transport costs? Markets have changed a lot this year"','"Send me an email" → "Absolutely, and what\'s the one route or cost that frustrates you most? I\'ll make sure my email speaks directly to that"','"We\'re too small for a contract" → "We work with businesses of all sizes — even a weekly single delivery can be put on a preferential rate with us"']
-  },
-  // CLOSING
-  {cat:'closing',catLabel:'Closing Deals',catColor:'#e85d3a',catBg:'#fde8e3',icon:'🤝',bg:'#fde8e3',
-   title:'How to close a logistics deal',
-   body:'Most agents lose deals in the last 20%. The close has to feel natural — like you\'re helping them make a decision they already want to make.',
-   steps:['Summarise value: "So based on what you\'ve told me — you dispatch to Cape Town 3x a week. Our dedicated truck saves you R 8 000 a month vs your current courier"','Create urgency without pressure: "We have one truck available on the Cape Town route from next Monday — I\'d hate for you to miss that slot"','Trial close: "If the pricing works for you, is there anything else stopping us from getting started?"','If they\'re stalling: offer a one-week pilot at cost — it removes all perceived risk and almost always converts']
-  },
-  {cat:'closing',catLabel:'Closing Deals',catColor:'#e85d3a',catBg:'#fde8e3',icon:'📈',bg:'#fde8e3',
-   title:'Grow a client after you close them',
-   body:'The easiest new revenue is from existing clients. After the first month, every client should be reviewed for upsell opportunities.',
-   steps:['After 30 days: "How has the service been? Is there another route we could take over for you?"','Introduce JKJ or DHL for cross-border or express needs Mok\'s fleet can\'t cover — you still earn the deal','Referral ask: "Do you know any other operations managers who struggle with freight costs? We\'d love an intro"','Annual review: pull 12 months of their invoices, show cost savings, and propose a renewed contract with a rate lock']
-  }
+  {cat:"prospecting",catLabel:"Prospecting",catColor:"#2d7dd2",catBg:"#ddeeff",icon:"🎯",bg:"#ddeeff",title:"Where to find logistics clients in SA",body:"The best clients for Mok Transports Services are companies that move physical goods regularly. Focus on: FMCG, manufacturing, retail chains, construction, mining supply, and pharma distribution.",steps:["Search Google Maps for warehouses or distribution centres in your area","Visit industrial parks in Germiston, Midrand, Isando, Alrode — walk in and ask for the logistics manager","Check LinkedIn for companies advertising logistics coordinator roles — they clearly have freight needs","Use yellowpages.co.za and kompass.com/south-africa to build a call list by industry"]},
+  {cat:"prospecting",catLabel:"Prospecting",catColor:"#2d7dd2",catBg:"#ddeeff",icon:"🏭",bg:"#ddeeff",title:"Target industries that always need trucks",body:"Some industries move freight every single day. Prioritise these for Mok Transports Services own fleet contracts.",steps:["Retail chains (Shoprite, Pick n Pay, Spar independents) need daily store deliveries","FMCG manufacturers dispatch weekly to regional warehouses — pitch a dedicated truck","Construction companies move materials to sites constantly — look for active building sites nearby","Agricultural co-ops move seasonal bulk goods — time your pitch before harvest season"]},
+  {cat:"prospecting",catLabel:"Prospecting",catColor:"#2d7dd2",catBg:"#ddeeff",icon:"🔍",bg:"#ddeeff",title:"How to find clients online",body:"Social media and directories are free prospecting tools. Use them daily.",steps:["LinkedIn: search operations manager or supply chain manager in Johannesburg — connect and send a short intro","Facebook Groups: join Johannesburg Business Network or SA SMME Groups for logistics leads","Government tenders: register on etenders.gov.za — Mok fleet can qualify for transport contracts","Kompass SA and Bizcommunity list thousands of SA companies by industry — build your call list here"]},
+  {cat:"fleet",catLabel:"Own Fleet",catColor:"#1aaf82",catBg:"#d6f5ec",icon:"🚚",bg:"#d6f5ec",title:"How to pitch Mok own fleet",body:"Unlike brokers who outsource, Mok Transports Services owns its trucks. This is your strongest selling point.",steps:["We own our fleet — no middlemen, no markups, no surprises on your invoice","Emphasise reliability: Our drivers are our employees. We know where every truck is, every hour","Offer flexibility: We can dedicate a truck to your routes on a monthly contract","Mention accountability: If there is a problem, you call us directly — not a call centre"]},
+  {cat:"fleet",catLabel:"Own Fleet",catColor:"#1aaf82",catBg:"#d6f5ec",icon:"📋",bg:"#d6f5ec",title:"Selling dedicated truck contracts",body:"The most profitable deal for Mok is a dedicated truck contract. One client, one truck, fixed monthly fee.",steps:["Ask: How many deliveries do you make per week, and where? — map routes to Mok capacity","If they dispatch 3+ times a week, a dedicated truck is cheaper than ad-hoc rates","Present: A dedicated truck at R35-50k/month vs R1500 per delivery 5x a week = you save money","Offer a free first-week trial — this almost always converts to a signed contract"]},
+  {cat:"fleet",catLabel:"Own Fleet",catColor:"#1aaf82",catBg:"#d6f5ec",icon:"🗺️",bg:"#d6f5ec",title:"Win clients with a free route audit",body:"Offer a free route audit — review a client current logistics spend and show where Mok saves them money.",steps:["Ask for 3 months of their courier/transport invoices — most clients overspend by 15-30%","Map their delivery routes and show consolidation opportunities using Mok trucks","Present a side-by-side: Current spend vs Mok contract with Rand savings highlighted","Close with: We can start a pilot route next week at no risk — if you are not satisfied, you do not pay"]},
+  {cat:"coldcall",catLabel:"Cold Calling",catColor:"#f5a623",catBg:"#fef3dc",icon:"📞",bg:"#fef3dc",title:"Cold call script for logistics sales",body:"A good cold call lasts 90 seconds and ends with a meeting booked, not a sale.",steps:["Hi, I am [Name] from Mok Transports Services — we own our own fleet. Who handles your transport?","Once connected: We help companies reduce freight costs using our own trucks. Do you use third-party couriers?","We have helped similar businesses save 20-30% by switching to a direct fleet contract. Can we chat for 15 minutes?","I can send you a quick cost comparison — what is your email? No obligation at all."]},
+  {cat:"coldcall",catLabel:"Cold Calling",catColor:"#f5a623",catBg:"#fef3dc",icon:"⏰",bg:"#fef3dc",title:"Best times and days to call",body:"Timing your calls doubles your connect rate. Logistics managers are reachable outside dispatch windows.",steps:["Best days: Tuesday, Wednesday, Thursday — Monday is chaotic, Friday people are winding down","Best times: 8:00-9:30am (before the day gets busy) and 2:00-4:00pm (after lunch)","Avoid: Monday mornings, Friday afternoons, and month-end week","Send a WhatsApp after a missed call — gets 3x more replies than voicemail"]},
+  {cat:"coldcall",catLabel:"Cold Calling",catColor:"#f5a623",catBg:"#fef3dc",icon:"💬",bg:"#fef3dc",title:"Handling common objections",body:"Every logistics sales call faces the same objections. Know these answers cold.",steps:["We already have a supplier — We do not ask you to switch everything, let us quote on one route and you compare","We are happy — When last did you benchmark your transport costs? Markets have changed a lot this year","Send me an email — What is the one route or cost that frustrates you most? I will make my email speak to that","We are too small — We work with businesses of all sizes, even one weekly delivery gets a preferential rate"]},
+  {cat:"closing",catLabel:"Closing Deals",catColor:"#e85d3a",catBg:"#fde8e3",icon:"🤝",bg:"#fde8e3",title:"How to close a logistics deal",body:"Most agents lose deals in the last 20%. The close should feel like helping them decide, not pushing.",steps:["Summarise value: You dispatch to Cape Town 3x a week — our dedicated truck saves you R8 000 a month","Create urgency: We have one truck available on that route from Monday — I would hate for you to miss it","Trial close: If the pricing works for you, is there anything else stopping us from getting started?","If stalling: offer a one-week pilot at cost — removes all perceived risk, almost always converts"]},
+  {cat:"closing",catLabel:"Closing Deals",catColor:"#e85d3a",catBg:"#fde8e3",icon:"📈",bg:"#fde8e3",title:"Grow a client after you close them",body:"The easiest new revenue is from existing clients. Review every client after 30 days.",steps:["After 30 days: How has the service been? Is there another route we could take over for you?","Introduce JKJ or DHL for routes Mok fleet cannot cover — you still earn the deal","Referral ask: Do you know other ops managers who struggle with freight costs? We would love an intro","Annual review: show 12 months of cost savings and propose a renewed contract with a rate lock"]}
 ];
-
 let activeTipCat='all';
 function renderTips(){
   const view=document.getElementById('view-tips');
   if(!view)return;
   view.innerHTML=`
     <div class="playbook-banner">
-      <div class="playbook-text">
-        <div class="playbook-title">Mok Transports · Sales Playbook</div>
-        <div class="playbook-sub">Step-by-step coaching for Neo and Mavis to find, pitch and close logistics clients — including Mok Transports Services' own fleet contracts</div>
-      </div>
+      <div class="playbook-text"><div class="playbook-title">Mok Transports Services · Sales Playbook</div><div class="playbook-sub">Step-by-step coaching for Neo and Mavis — prospecting, fleet pitching, cold calling and closing logistics clients</div></div>
       <div class="playbook-icon">🚛</div>
     </div>
     <div class="tips-header">
@@ -988,52 +1002,61 @@ function renderTipCards(){
   if(!grid)return;
   const filtered=activeTipCat==='all'?TIPS_DATA:TIPS_DATA.filter(t=>t.cat===activeTipCat);
   grid.innerHTML='';
-  filtered.forEach((t,i)=>{
+  filtered.forEach(t=>{
     const card=document.createElement('div');
     card.className='tip-card';
     card.innerHTML=`
-      <div class="tip-card-top">
-        <div class="tip-icon" style="background:${t.bg}">${t.icon}</div>
+      <div class="tip-card-top"><div class="tip-icon" style="background:${t.bg}">${t.icon}</div>
         <div><div class="tip-title">${t.title}</div><div class="tip-body">${t.body}</div></div>
       </div>
-      <div class="tip-steps">
-        ${t.steps.map((s,si)=>`<div class="tip-step"><div class="tip-step-num" style="background:${t.catColor}">${si+1}</div><span>${s}</span></div>`).join('')}
-      </div>
-      <div class="tip-footer">
-        <span class="tip-cat-label" style="background:${t.catBg};color:${t.catColor}">${t.catLabel}</span>
-      </div>`;
+      <div class="tip-steps">${t.steps.map((s,i)=>`<div class="tip-step"><div class="tip-step-num" style="background:${t.catColor}">${i+1}</div><span>${s}</span></div>`).join('')}</div>
+      <div class="tip-footer"><span class="tip-cat-label" style="background:${t.catBg};color:${t.catColor}">${t.catLabel}</span></div>`;
     grid.appendChild(card);
   });
 }
 
 // ─── ADD DEAL ─────────────────────────────────────────────────────────────────
-function openModal(){document.getElementById('deal-modal').classList.add('open')}
-function closeModal(e){if(e.target===document.getElementById('deal-modal'))document.getElementById('deal-modal').classList.remove('open')}
-function addDeal(){
+function openModal(){
+  // Set agent for non-owner
+  if(currentRole==='neo')document.getElementById('f-agent').value='Neo';
+  if(currentRole==='mavis')document.getElementById('f-agent').value='Mavis';
+  document.getElementById('deal-modal').classList.add('open');
+}
+function closeOverlay(e,id){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');}
+async function addDeal(){
   const co=document.getElementById('f-co').value.trim();
   const val=parseFloat(document.getElementById('f-val').value);
-  const agent=document.getElementById('f-agent').value;
+  const agent=currentRole==='neo'?'Neo':currentRole==='mavis'?'Mavis':document.getElementById('f-agent').value;
   const stage=parseInt(document.getElementById('f-stage').value);
   const carrier=document.getElementById('f-carrier').value;
   const ship=document.getElementById('f-ship').value;
   const notes=document.getElementById('f-notes').value.trim();
-  if(!co||!val){alert('Please enter a company name and value.');return;}
-  const today=new Date();
-  const dateStr=today.toLocaleDateString('en-ZA',{day:'numeric',month:'short'});
-  deals.push({id:nid++,company:co,value:val,agent,stage,carrier,ship,won:stage===4,date:dateStr,notes});
-  document.getElementById('deal-modal').classList.remove('open');
-  ['f-co','f-val','f-notes'].forEach(id=>document.getElementById(id).value='');
-  renderAll();
-  const activeView=document.querySelector('.view.active');
-  if(activeView){
-    const id=activeView.id;
-    if(id==='view-pipeline')renderPipeline();
-    else if(id==='view-mydeals')renderMyDeals();
-    else if(id==='view-dashboard')renderDashboard();
-    else if(id==='view-agents')renderAgents();
+  if(!co||!val){toast('Please enter a company name and value.','error');return;}
+  const btn=document.getElementById('save-deal-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  const saved=await saveDealToDB({company:co,value:val,agent,stage,carrier,ship,notes});
+  btn.disabled=false;btn.textContent='Save deal';
+  if(saved){
+    document.getElementById('deal-modal').classList.remove('open');
+    ['f-co','f-val','f-notes'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-carrier').value='none';
+    document.getElementById('ship-help-row').style.display='none';
+    await loadDeals();
+    renderAll();
+    const av=document.querySelector('.view.active');
+    if(av){const id=av.id;if(id==='view-pipeline')renderPipeline();else if(id==='view-mydeals')renderMyDeals();else if(id==='view-dashboard')renderDashboard();}
   }
 }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    document.getElementById('loading-overlay').classList.add('hidden');
+    document.getElementById('login-screen').style.display='flex';
+  },800);
+});
 </script>
 </body>
 </html>
+
 
