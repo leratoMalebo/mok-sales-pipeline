@@ -250,6 +250,24 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
 .btn-secondary:hover{background:var(--off)}
 .sec-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
 
+
+/* ── QUOTE BUTTON ─────────────────────────────── */
+.quote-btn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap;font-family:inherit}
+.quote-btn:hover{background:var(--teal);color:#fff}
+.quote-btn svg{width:11px;height:11px;flex-shrink:0}
+.deal-actions{display:flex;align-items:center;justify-content:space-between;margin-top:7px;padding-top:7px;border-top:1px solid var(--border)}
+.advance-btn{font-size:10px;font-weight:500;color:var(--text3);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;transition:color .15s}
+.advance-btn:hover{color:var(--blue)}
+/* Quote modal */
+.quote-modal-body{display:flex;flex-direction:column;gap:12px}
+.quote-preview{background:var(--off);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:12px;line-height:1.7;color:var(--text2)}
+.quote-preview-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.quote-ref{font-size:10px;font-family:"DM Mono",monospace;background:var(--navy);color:rgba(255,255,255,0.7);padding:2px 8px;border-radius:4px}
+.quote-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)}
+.quote-row:last-child{border-bottom:none;font-weight:600;color:var(--text);padding-top:8px}
+.quote-open-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:var(--teal);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s;text-decoration:none}
+.quote-open-btn:hover{background:#17976e}
+
 /* ── LOG MODAL ────────────────────────────── */
 .log-modal{width:340px}
 
@@ -330,7 +348,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
         <input class="lf-pin" type="password" maxlength="1" id="pin4" inputmode="numeric" pattern="[0-9]">
       </div>
       <button class="lf-btn" id="lf-btn" onclick="doLogin()">Sign in to pipeline</button>
-      <div class="lf-footer">Default PIN for all profiles is <strong style="color:rgba(255,255,255,0.5)">1234</strong><br>Ask Lerato to update PINs in Database.</div>
+      <div class="lf-footer">Default PIN for all profiles is <strong style="color:rgba(255,255,255,0.5)">1234</strong><br>Ask Ryan to update PINs in Supabase.</div>
     </div>
   </div>
 </div>
@@ -435,6 +453,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
 <!-- TOAST -->
 <div id="toast"></div>
 
+
+<!-- QUOTE MODAL -->
+<div class="overlay" id="quote-modal" onclick="closeOverlay(event,'quote-modal')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:420px">
+    <div class="modal-title" style="display:flex;align-items:center;gap:10px">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="var(--teal)" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>
+      Send quote to client
+    </div>
+    <div id="quote-modal-content" class="quote-modal-body"></div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-secondary" onclick="document.getElementById('quote-modal').classList.remove('open')">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── SUPABASE CONFIG ──────────────────────────────────────────────────────────
 // 🔧 REPLACE THESE with your actual Supabase project URL and anon key
@@ -444,7 +477,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'1234', neo:'1234', mavis:'1234' };
+const PINS = { ryan:'Karabo2009', neo:'Karabo2009', mavis:'Karabo2009' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -721,24 +754,81 @@ function renderKanban(boardId,agentFilter){
       const card=document.createElement('div');
       card.className='deal-card';
       const shipRow=shipKey&&shipKey!=='none'?`<div class="ship-row"><div class="ship-pill" style="background:${ss.bg};color:${ss.color}"><div class="ship-dot" style="background:${ss.color}"></div>${CARRIER_LABELS[carrierKey]||carrierKey} · ${ss.label}</div></div>`:'';
-      card.innerHTML=`<div class="move-hint">click to advance →</div><div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}`;
+      const dealId=d.id;
+      const af2=agentFilter||'';
+      card.innerHTML=`<div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}<div class="deal-actions"><button class="advance-btn" data-id="${dealId}" data-board="${boardId}" data-af="${agentFilter||''}">Advance stage →</button><button class="quote-btn" data-id="${dealId}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>Quote</button></div>`;
       if(d.notes)card.title=d.notes;
-      card.onclick=()=>advanceDeal(d,boardId,agentFilter);
+      card.querySelector('.advance-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));advanceDeal(deal,boardId,agentFilter);});
+      card.querySelector('.quote-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));if(deal)openQuoteModal(deal);});
       cc.appendChild(card);
     });
   });
 }
 
 async function advanceDeal(d,boardId,af){
-  if(d.stage>=4){toast('Deal is already closed won.');return;}
+  if(!d||typeof d==='string')return;
+  if(d.stage>=4){toast('Deal is already Closed Won.');return;}
   const next=STAGES[d.stage+1].label;
   if(!confirm('Move "'+d.company+'" to "'+next+'"?'))return;
   const ok=await updateDealStage(d.id,d.stage+1);
   if(!ok)return;
   d.stage++;d.won=(d.stage===4);
+  // Update in global deals array too
+  const idx=deals.findIndex(x=>x.id===d.id);
+  if(idx>-1){deals[idx].stage=d.stage;deals[idx].won=d.won;}
   renderKanban(boardId,af);
   renderStats(boardId==='my-kanban-board'?'my-stats-row':'stats-row',af);
   if(currentRole==='ryan'){renderDashboard();renderAgents();}
+}
+
+// ─── QUOTE ────────────────────────────────────────────────────────────────────
+const QUOTE_BASE='https://mok-quotation-system.vercel.app/';
+
+function buildQuoteUrl(d){
+  const params=new URLSearchParams({
+    company: d.company||'',
+    value:   d.value||'',
+    agent:   getAgent(d)||'',
+    carrier: getCarrier(d)||'none',
+    route:   d.notes||'',
+    ref:     'MTRS-'+(d.id||'').toString().slice(0,8).toUpperCase()
+  });
+  return QUOTE_BASE+'?'+params.toString();
+}
+
+function genRef(d){
+  const id=(d.id||'').toString().replace(/-/g,'').slice(0,6).toUpperCase();
+  return 'MTRS-'+id;
+}
+
+function openQuoteModalById(id){const d=deals.find(x=>x.id===id||x.id===Number(id));if(d)openQuoteModal(d);}
+function advanceDealById(id,boardId,af){const d=deals.find(x=>x.id===id||x.id===Number(id));if(d)advanceDeal(d,boardId,af||null);}
+let quoteTargetDeal=null;
+function openQuoteModal(d){
+  quoteTargetDeal=d;
+  const ref=genRef(d);
+  const agentName=getAgent(d);
+  const carrierLabel=CARRIER_LABELS[getCarrier(d)]||'Not assigned';
+  const stage=STAGES[d.stage]?.label||'';
+  const url=buildQuoteUrl(d);
+  const el=document.getElementById('quote-modal-content');
+  el.innerHTML=`
+    <div class="quote-preview">
+      <div class="quote-preview-title">Quote summary <span class="quote-ref">${ref}</span></div>
+      <div class="quote-row"><span>Client</span><span style="font-weight:600;color:var(--text)">${d.company}</span></div>
+      <div class="quote-row"><span>Agent</span><span>${agentName}</span></div>
+      <div class="quote-row"><span>Deal stage</span><span>${stage}</span></div>
+      <div class="quote-row"><span>Shipment type</span><span>${carrierLabel}</span></div>
+      <div class="quote-row"><span>Notes / Route</span><span style="max-width:160px;text-align:right">${d.notes||'—'}</span></div>
+      <div class="quote-row"><span>Estimated value</span><span style="color:var(--teal)">${fmt(d.value)}</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);line-height:1.6;margin-top:4px">The details above will be passed to the Mok quotation system. You can review and edit the full quote before sending it to the client.</p>
+    <a class="quote-open-btn" href="${url}" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>
+      Open quotation system
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 10L10 2M5 2h5v5"/></svg>
+    </a>`;
+  document.getElementById('quote-modal').classList.add('open');
 }
 
 // ─── AGENTS ───────────────────────────────────────────────────────────────────
@@ -1058,7 +1148,6 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-
 
 
 
