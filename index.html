@@ -533,7 +533,13 @@ function fmtDate(d){return new Date(d).toLocaleDateString('en-ZA',{day:'numeric'
 async function loadDeals(){
   const{data,error}=await sb.from('deals').select('*').order('created_at',{ascending:false});
   if(error){toast('Could not load deals: '+error.message,'error');return;}
-  deals=data.map(d=>({...d,won:d.stage===4}));
+  deals=data.map(d=>({
+    ...d,
+    // normalise: always expose agent_name for rendering
+    agent_name: d.agent_name||d.agent||'',
+    ship:       d.ship_status||d.ship||'none',
+    won:        d.stage===4
+  }));
 }
 async function loadLogs(){
   const{data,error}=await sb.from('activity_log').select('*').order('created_at',{ascending:false});
@@ -546,18 +552,24 @@ async function loadLogs(){
   });
 }
 async function saveDealToDB(deal){
-  const{data,error}=await sb.from('deals').insert([{
-    company:deal.company,value:deal.value,agent_name:deal.agent,
-    stage:deal.stage,carrier:deal.carrier,ship_status:deal.ship,
-    notes:deal.notes||''
-  }]).select().single();
+  const payload={
+    company:    deal.company,
+    value:      deal.value,
+    agent_name: deal.agent,
+    stage:      deal.stage,
+    carrier:    deal.carrier||'none',
+    ship_status:deal.ship||'none',
+    notes:      deal.notes||'',
+    won:        deal.stage===4
+  };
+  const{data,error}=await sb.from('deals').insert([payload]).select().single();
   if(error){toast('Error saving deal: '+error.message,'error');return null;}
   toast('Deal saved ✓','success');
   return data;
 }
 async function updateDealStage(id,stage){
-  const{error}=await sb.from('deals').update({stage,won:stage===4}).eq('id',id);
-  if(error){toast('Error updating deal','error');return false;}
+  const{error}=await sb.from('deals').update({stage:stage,won:stage===4}).eq('id',id);
+  if(error){toast('Error updating deal: '+error.message,'error');return false;}
   toast('Deal moved ✓','success');
   return true;
 }
@@ -729,7 +741,7 @@ function renderMyDeals(){
   renderStats('my-stats-row',name);
   renderKanban('my-kanban-board',name);
 }
-function getAgent(d){return d.agent_name||d.agent||''}
+function getAgent(d){return d.agent_name||d.agent||d.agent_id||''}
 function getShip(d){return d.ship_status||d.ship||'none'}
 function getCarrier(d){return d.carrier||'none'}
 
@@ -1148,9 +1160,6 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-
-
-
 
 
 
