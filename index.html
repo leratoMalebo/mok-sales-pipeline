@@ -373,7 +373,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
         <input class="lf-pin" type="password" maxlength="1" id="pin4" inputmode="numeric" pattern="[0-9]">
       </div>
       <button class="lf-btn" id="lf-btn" onclick="doLogin()">Sign in to pipeline</button>
-      <div class="lf-footer">Default PIN for all profiles is <strong style="color:rgba(255,255,255,0.5)">1234</strong><br>Ask Ryan to update PINs in Supabase.</div>
+      <div class="lf-footer">Each profile has its own PIN.<br>Forgotten your PIN? Ask Ryan.</div>
     </div>
   </div>
 </div>
@@ -508,7 +508,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'1234', neo:'1234', mavis:'1234' };
+const PINS = { ryan:'8420', neo:'3157', mavis:'6293' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -1390,6 +1390,9 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
+
+
+
 
 
 
