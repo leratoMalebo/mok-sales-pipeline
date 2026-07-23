@@ -95,6 +95,31 @@ body{font-family:"DM Sans",sans-serif;background:var(--off);color:var(--text);mi
 .add-deal-btn{padding:7px 16px;background:var(--blue);border:none;border-radius:var(--radius-sm);color:#fff;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
 .add-deal-btn:hover{background:var(--blue-light)}
 .owner-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--amber-pale);color:#9a6800;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-left:6px}
+/* ── DAILY REPORTS ────────────────────────── */
+.report-wrap{max-width:720px}
+.report-banner{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:18px;font-size:12px;font-weight:600}
+.report-banner.ok{background:var(--teal-pale);color:#0d7a58}
+.report-banner.warn{background:var(--coral-pale);color:#b6431f}
+.report-form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.report-form .fg.full{grid-column:1/-1}
+.report-save-row{display:flex;justify-content:flex-end;margin-top:16px}
+.targets-card{margin-top:22px}
+.target-mini-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.target-mini-lbl{font-size:11px;color:var(--text2);width:150px;flex-shrink:0}
+.target-mini-bar{flex:1}
+.target-mini-val{font-size:11px;color:var(--text3);width:80px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+.status-pill{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.status-pill.submitted{background:var(--teal-pale);color:#0d7a58}
+.status-pill.missing{background:var(--coral-pale);color:#b6431f}
+.rt-table-wrap{overflow-x:auto}
+.rt-table{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap}
+.rt-table th{text-align:left;color:var(--text3);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.04em;padding:8px 10px;border-bottom:1px solid var(--border)}
+.rt-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.rt-empty{color:var(--text3);font-style:italic;font-size:12px;padding:10px 0}
+.owner-report-card{margin-bottom:16px}
+.qtr-strip{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:var(--navy);border-radius:var(--radius);color:#fff;margin-bottom:18px}
+.qtr-strip-lbl{font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.06em}
+.qtr-strip-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
 .main{flex:1;padding:24px;max-width:1400px;margin:0 auto;width:100%}
 .view{display:none}.view.active{display:block}
 
@@ -388,6 +413,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
     <div id="view-dashboard" class="view">
       <div id="dashboard-content"></div>
     </div>
+    <div id="view-report" class="view">
+      <div id="report-content"></div>
+    </div>
+    <div id="view-reports" class="view">
+      <div id="reports-content"></div>
+    </div>
     <div id="view-carriers" class="view">
       <div id="carriers-content"></div>
     </div>
@@ -491,6 +522,30 @@ const AGENTS={
   Neo:{color:'#534ab7',bg:'#ede9f8',lbl:'NL',full:'Neo Lumkwana',target:200000},
   Mavis:{color:'#d44f8a',bg:'#fce8f2',lbl:'MS',full:'Mavis Selomana',target:200000}
 };
+// ─── SALES TARGETS (Q3 2026 performance targets — same for every agent) ───────
+const QUARTER_TARGET=1300000;
+const MONTH_TARGETS={
+  6:{name:'July',     domestic:100000,intl:350000,weekly:70000,daily:17500},
+  7:{name:'August',   domestic:100000,intl:300000,weekly:75000,daily:15000},
+  8:{name:'September',domestic:150000,intl:350000,weekly:70000,daily:17500}
+};
+function monthTargetFor(date){return MONTH_TARGETS[(date||new Date()).getMonth()]||MONTH_TARGETS[6];}
+function currentMonthTarget(){return monthTargetFor(new Date());}
+// Weekly/monthly activity targets, per agent, from the "Performance Expectations" section
+const ACTIVITY_TARGETS=[
+  {key:'cold_calls',      label:'Cold calls',            cadence:'week', amount:50},
+  {key:'appointments',    label:'Qualified appointments',cadence:'week', amount:10},
+  {key:'sales_visits',    label:'Sales visits',          cadence:'week', amount:10},
+  {key:'new_clients',     label:'New clients',           cadence:'month',amount:10},
+  {key:'shipments_gained',label:'Shipments gained',      cadence:'week', amount:3}
+];
+// Apply the current month's revenue target to each agent (both agents share identical targets)
+(function applyMonthlyTargets(){
+  const mt=currentMonthTarget();
+  const val=mt.domestic+mt.intl;
+  AGENTS.Neo.target=val;
+  AGENTS.Mavis.target=val;
+})();
 const SHIP={
   none:{label:'No shipment',color:'#8fa3ba',bg:'#eef1f7'},
   booked:{label:'Booked',color:'#2d7dd2',bg:'#ddeeff'},
@@ -516,7 +571,7 @@ function updateShipHelp(val){
 }
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let deals=[], activityLogs={}, currentRole=null, currentFilter='all', logTargetAgent=null;
+let deals=[], activityLogs={}, dailyReports=[], currentRole=null, currentFilter='all', logTargetAgent=null;
 
 // ─── TOAST ────────────────────────────────────────────────────────────────────
 function toast(msg,type=''){
@@ -582,6 +637,42 @@ async function saveActivityToDB(agentName,note,dealId=null){
   return true;
 }
 
+// ─── DAILY REPORTS ────────────────────────────────────────────────────────────
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function mondayStr(d){
+  const dd=d?new Date(d):new Date();
+  const day=dd.getDay();
+  const diff=(day===0?-6:1-day);
+  dd.setDate(dd.getDate()+diff);
+  return dd.toISOString().slice(0,10);
+}
+function monthStr(d){const dd=d?new Date(d):new Date();return dd.toISOString().slice(0,7);}
+async function loadDailyReports(){
+  const{data,error}=await sb.from('daily_reports').select('*').order('report_date',{ascending:false});
+  if(error){toast('Could not load daily reports: '+error.message,'error');return;}
+  dailyReports=data||[];
+}
+async function upsertDailyReport(payload){
+  const{data,error}=await sb.from('daily_reports').upsert([payload],{onConflict:'agent_name,report_date'}).select().single();
+  if(error){toast('Error saving report: '+error.message,'error');return null;}
+  toast('Daily report saved ✓','success');
+  return data;
+}
+function reportsFor(name){return dailyReports.filter(r=>r.agent_name===name);}
+function reportsThisWeek(name){const mon=mondayStr();return reportsFor(name).filter(r=>r.report_date>=mon);}
+function reportsThisMonth(name){const ms=monthStr();return reportsFor(name).filter(r=>r.report_date.slice(0,7)===ms);}
+function sumField(reports,key){return reports.reduce((s,r)=>s+(Number(r[key])||0),0);}
+function todaysReport(name){return reportsFor(name).find(r=>r.report_date===todayStr())||null;}
+// Returns [{...target, actual, pct}] for an agent using the right cadence window
+function activityProgress(name){
+  const wk=reportsThisWeek(name),mo=reportsThisMonth(name);
+  return ACTIVITY_TARGETS.map(t=>{
+    const reports=t.cadence==='month'?mo:wk;
+    const actual=sumField(reports,t.key);
+    return{...t,actual,pct:Math.min(100,Math.round(actual/t.amount*100))};
+  });
+}
+
 // ─── LOGIN ────────────────────────────────────────────────────────────────────
 document.querySelectorAll('.lf-pin').forEach((pin,i,pins)=>{
   pin.addEventListener('input',e=>{
@@ -608,6 +699,7 @@ async function doLogin(){
   btn.disabled=true;btn.innerHTML='<span class="lf-loading"></span>Signing in...';
   await loadDeals();
   await loadLogs();
+  await loadDailyReports();
   currentRole=profile;
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='flex';
@@ -616,7 +708,7 @@ async function doLogin(){
   btn.disabled=false;btn.textContent='Sign in to pipeline';
 }
 function logout(){
-  currentRole=null;currentFilter='all';deals=[];activityLogs={};
+  currentRole=null;currentFilter='all';deals=[];activityLogs={};dailyReports=[];
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   ['pin1','pin2','pin3','pin4'].forEach(id=>document.getElementById(id).value='');
@@ -640,6 +732,7 @@ function setupApp(){
       {id:'dashboard',label:'Dashboard'},
       {id:'pipeline',label:'Full pipeline'},
       {id:'agents',label:'Agents'},
+      {id:'reports',label:'Reports'},
       {id:'carriers',label:'Carriers'},
       {id:'tips',label:'Tips'}
     ];
@@ -660,6 +753,7 @@ function setupApp(){
     un.textContent=a.full;
     const tabs=[
       {id:'mydeals',label:'My deals'},
+      {id:'report',label:'Daily report'},
       {id:'carriers',label:'Carriers'},
       {id:'tips',label:'Tips'}
     ];
@@ -696,10 +790,12 @@ function switchView(name,btn){
   else if(name==='dashboard')renderDashboard();
   else if(name==='carriers')renderCarriers();
   else if(name==='tips')renderTips();
+  else if(name==='report')renderReportView();
+  else if(name==='reports')renderReportsOverview();
 }
 function renderAll(){
-  if(currentRole==='ryan'){renderDashboard();renderAgents();}
-  else{renderMyDeals();}
+  if(currentRole==='ryan'){renderDashboard();renderAgents();renderReportsOverview();}
+  else{renderMyDeals();renderReportView();}
   renderCarriers();renderTips();
 }
 
@@ -904,6 +1000,136 @@ async function saveLog(){
   }
 }
 
+// ─── DAILY REPORT (agent view) ─────────────────────────────────────────────────
+function renderReportView(){
+  const el=document.getElementById('report-content');
+  if(!el||currentRole==='ryan')return;
+  const name=currentRole==='neo'?'Neo':'Mavis';
+  const a=AGENTS[name];
+  const existing=todaysReport(name);
+  const mt=currentMonthTarget();
+  const prog=activityProgress(name);
+  el.innerHTML=`
+    <div class="report-wrap">
+      <div class="report-banner ${existing?'ok':'warn'}">
+        ${existing?'✓ Today\'s report is submitted. You can update it any time before end of day.':'⚠ You haven\'t shared today\'s pipeline report with Ryan yet — please fill it in below.'}
+      </div>
+      <div class="dash-card" style="margin-bottom:20px">
+        <div class="dash-card-title">Today's report — ${fmtDate(new Date())}</div>
+        <div class="report-form">
+          <div class="fg"><label class="fl">Cold calls</label><input type="number" min="0" id="dr-cold" value="${existing?existing.cold_calls:0}"></div>
+          <div class="fg"><label class="fl">Appointments</label><input type="number" min="0" id="dr-appt" value="${existing?existing.appointments:0}"></div>
+          <div class="fg"><label class="fl">Sales visits</label><input type="number" min="0" id="dr-visits" value="${existing?existing.sales_visits:0}"></div>
+          <div class="fg"><label class="fl">New clients</label><input type="number" min="0" id="dr-new" value="${existing?existing.new_clients:0}"></div>
+          <div class="fg full"><label class="fl">Shipments gained</label><input type="number" min="0" id="dr-ship" value="${existing?existing.shipments_gained:0}"></div>
+          <div class="fg full"><label class="fl">Notes for Ryan</label><textarea id="dr-notes" rows="3" placeholder="Anything Ryan should know — blockers, wins, follow-ups...">${existing?existing.notes||'':''}</textarea></div>
+        </div>
+        <div class="report-save-row">
+          <button class="btn-primary" id="save-report-btn" onclick="saveDailyReport()">${existing?'Update today\'s report':'Save today\'s report'}</button>
+        </div>
+      </div>
+      <div class="dash-card targets-card">
+        <div class="dash-card-title">Your targets — ${mt.name} 2026</div>
+        <div class="target-mini-row">
+          <div class="target-mini-lbl">Revenue (${mt.name})</div>
+          <div class="target-mini-bar"><div class="prog-bg"><div class="prog-fill" style="width:${Math.min(100,Math.round(sumWonThisMonth(name)/(mt.domestic+mt.intl)*100))}%;background:${a.color}"></div></div></div>
+          <div class="target-mini-val">${fmt(mt.domestic+mt.intl)}</div>
+        </div>
+        ${prog.map(p=>`<div class="target-mini-row">
+          <div class="target-mini-lbl">${p.label} <span style="color:var(--text3)">/ ${p.cadence}</span></div>
+          <div class="target-mini-bar"><div class="prog-bg"><div class="prog-fill" style="width:${p.pct}%;background:${p.pct>=70?'#1aaf82':p.pct>=35?'#f5a623':'#e85d3a'}"></div></div></div>
+          <div class="target-mini-val">${p.actual} / ${p.amount}</div>
+        </div>`).join('')}
+        <p style="font-size:11px;color:var(--text3);margin-top:8px;line-height:1.6">Weekly targets reset every Monday · Monthly targets reset on the 1st · Debrief with Ryan every Friday 15h30–16h00.</p>
+      </div>
+      <div class="dash-card owner-report-card" style="margin-top:20px">
+        <div class="dash-card-title">Your recent reports</div>
+        ${renderReportTable(reportsFor(name).slice(0,10),false)}
+      </div>
+    </div>`;
+}
+function sumWonThisMonth(name){
+  const now=new Date();
+  return deals.filter(d=>getAgent(d)===name&&d.won&&new Date(d.created_at||now).getMonth()===now.getMonth())
+    .reduce((s,d)=>s+(d.value||0),0);
+}
+async function saveDailyReport(){
+  const name=currentRole==='neo'?'Neo':'Mavis';
+  const payload={
+    agent_name:name,
+    report_date:todayStr(),
+    cold_calls:Number(document.getElementById('dr-cold').value)||0,
+    appointments:Number(document.getElementById('dr-appt').value)||0,
+    sales_visits:Number(document.getElementById('dr-visits').value)||0,
+    new_clients:Number(document.getElementById('dr-new').value)||0,
+    shipments_gained:Number(document.getElementById('dr-ship').value)||0,
+    notes:document.getElementById('dr-notes').value.trim()
+  };
+  const btn=document.getElementById('save-report-btn');
+  btn.disabled=true;btn.textContent='Saving...';
+  const res=await upsertDailyReport(payload);
+  btn.disabled=false;
+  if(res){await loadDailyReports();renderReportView();}
+  else btn.textContent='Save today\'s report';
+}
+function renderReportTable(reports,showAgent){
+  if(!reports.length)return'<div class="rt-empty">No reports logged yet.</div>';
+  return`<div class="rt-table-wrap"><table class="rt-table"><thead><tr>
+    <th>Date</th>${showAgent?'<th>Agent</th>':''}<th>Cold calls</th><th>Appts</th><th>Visits</th><th>New clients</th><th>Shipments</th><th>Notes</th>
+  </tr></thead><tbody>
+    ${reports.map(r=>`<tr>
+      <td>${fmtDate(r.report_date)}</td>
+      ${showAgent?`<td>${r.agent_name}</td>`:''}
+      <td>${r.cold_calls||0}</td><td>${r.appointments||0}</td><td>${r.sales_visits||0}</td><td>${r.new_clients||0}</td><td>${r.shipments_gained||0}</td>
+      <td style="max-width:220px;white-space:normal;color:var(--text2)">${r.notes||'—'}</td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+// ─── REPORTS OVERVIEW (owner view) ─────────────────────────────────────────────
+function renderReportsOverview(){
+  const el=document.getElementById('reports-content');
+  if(!el||currentRole!=='ryan')return;
+  const mt=currentMonthTarget();
+  const names=['Neo','Mavis'];
+  const today=todayStr();
+  el.innerHTML=`
+    <div class="qtr-strip">
+      <div><div class="qtr-strip-lbl">Quarter 3 2026 sales target (per agent)</div><div class="qtr-strip-val">${fmt(QUARTER_TARGET)}</div></div>
+      <div><div class="qtr-strip-lbl">${mt.name} target · weekly ${fmt(mt.weekly)} · daily ${fmt(mt.daily)}</div><div class="qtr-strip-val">${fmt(mt.domestic+mt.intl)}</div></div>
+    </div>
+    <div class="dash-grid">
+      <div class="dash-card wide owner-report-card">
+        <div class="dash-card-title">Today's submissions — ${fmtDate(new Date())}</div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap">
+          ${names.map(nm=>{
+            const a=AGENTS[nm];const r=todaysReport(nm);
+            return`<div style="display:flex;align-items:center;gap:10px">
+              <div class="lb-avatar" style="background:${a.bg};color:${a.color};width:30px;height:30px;font-size:11px">${a.lbl}</div>
+              <div><div style="font-size:12px;font-weight:600">${a.full}</div>
+              <span class="status-pill ${r?'submitted':'missing'}">${r?'Submitted':'Not yet submitted'}</span></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      ${names.map(nm=>{
+        const a=AGENTS[nm];const prog=activityProgress(nm);
+        return`<div class="dash-card owner-report-card">
+          <div class="dash-card-title">${a.full} — activity vs target</div>
+          ${prog.map(p=>`<div class="target-mini-row">
+            <div class="target-mini-lbl">${p.label} <span style="color:var(--text3)">/ ${p.cadence}</span></div>
+            <div class="target-mini-bar"><div class="prog-bg"><div class="prog-fill" style="width:${p.pct}%;background:${p.pct>=70?'#1aaf82':p.pct>=35?'#f5a623':'#e85d3a'}"></div></div></div>
+            <div class="target-mini-val">${p.actual} / ${p.amount}</div>
+          </div>`).join('')}
+        </div>`;
+      }).join('')}
+      <div class="dash-card wide owner-report-card">
+        <div class="dash-card-title">All recent daily reports</div>
+        ${renderReportTable(dailyReports.slice(0,20),true)}
+      </div>
+    </div>`;
+}
+
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function renderDashboard(){
   const el=document.getElementById('dashboard-content');
@@ -994,6 +1220,10 @@ function renderDashboard(){
     <div class="dash-card">
       <div class="dash-card-title">Owner alerts</div>
       <div class="alerts-list">
+        <div class="alert-item ${(!todaysReport('Neo')||!todaysReport('Mavis'))?'warn':'good'}">
+          <div><div class="alert-title">${(!todaysReport('Neo')||!todaysReport('Mavis'))?'Daily report missing':'Both daily reports submitted'}</div>
+          <div class="alert-body">${!todaysReport('Neo')?'Neo has not shared today\'s report yet. ':''}${!todaysReport('Mavis')?'Mavis has not shared today\'s report yet.':''}${(todaysReport('Neo')&&todaysReport('Mavis'))?'Neo and Mavis have both shared their pipeline report for today.':''}</div></div>
+        </div>
         <div class="alert-item ${ns.tgtPct<30||ms.tgtPct<30?'warn':'good'}">
           <div><div class="alert-title">${ns.tgtPct<30||ms.tgtPct<30?'Agents below 30% of target':'Both agents on track'}</div>
           <div class="alert-body">${ns.tgtPct<30?'Neo is at '+ns.tgtPct+'%. ':''} ${ms.tgtPct<30?'Mavis is at '+ms.tgtPct+'%. ':''} ${ns.tgtPct>=30&&ms.tgtPct>=30?'Both Neo and Mavis are progressing toward their R 200k targets.':''}</div></div>
