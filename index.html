@@ -332,7 +332,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
       <div class="login-desc">The internal sales pipeline for the Mok Transports Services team. Track every deal, manage shipments, and grow client accounts — all in one place.</div>
       <div class="login-stats">
         <div>
-          <div class="login-stat-val">3</div>
+          <div class="login-stat-val">5</div>
           <div class="login-stat-lbl">Team members</div>
         </div>
         <div class="login-stat-divider"></div>
@@ -362,6 +362,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
           <option value="ryan">Ryan Mokgethi · System Owner</option>
           <option value="neo">Neo Lumkwana · Operations &amp; Sales</option>
           <option value="mavis">Mavis Selomana · Operations &amp; Sales</option>
+          <option value="cassey">Cassey Mokgethi · Sales &amp; Marketing</option>
+          <option value="masechaba">Masechaba Phea · Sales &amp; Marketing</option>
         </select>
       </div>
       <div class="lf-divider"><div class="lf-divider-line"></div><div class="lf-divider-text">then enter your PIN</div><div class="lf-divider-line"></div></div>
@@ -434,7 +436,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
       <div class="fg full"><label class="fl">Company name</label><input type="text" id="f-co" placeholder="e.g. Shoprite Holdings"/></div>
       <div class="fg"><label class="fl">Value (R)</label><input type="number" id="f-val" placeholder="e.g. 75000"/></div>
       <div class="fg" id="f-agent-wrap"><label class="fl">Agent</label>
-        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option></select>
+        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option><option value="Cassey">Cassey Mokgethi</option><option value="Masechaba">Masechaba Phea</option></select>
       </div>
       <div class="fg"><label class="fl">Stage</label>
         <select id="f-stage"><option value="0">Prospecting</option><option value="1">Qualified</option><option value="2">Proposal</option><option value="3">Negotiation</option><option value="4">Closed won</option></select>
@@ -508,7 +510,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'8420', neo:'3157', mavis:'6293' };
+const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', masechaba:'9023' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -520,7 +522,9 @@ const STAGES=[
 ];
 const AGENTS={
   Neo:{color:'#534ab7',bg:'#ede9f8',lbl:'NL',full:'Neo Lumkwana',target:200000},
-  Mavis:{color:'#d44f8a',bg:'#fce8f2',lbl:'MS',full:'Mavis Selomana',target:200000}
+  Mavis:{color:'#d44f8a',bg:'#fce8f2',lbl:'MS',full:'Mavis Selomana',target:200000},
+  Cassey:{color:'#0f7e6e',bg:'#d6f5ee',lbl:'CM',full:'Cassey Mokgethi',target:200000},
+  Masechaba:{color:'#b45309',bg:'#fef3dc',lbl:'MP',full:'Masechaba Phea',target:200000}
 };
 // ─── SALES TARGETS (Q3 2026 performance targets — same for every agent) ───────
 const QUARTER_TARGET=1300000;
@@ -545,6 +549,8 @@ const ACTIVITY_TARGETS=[
   const val=mt.domestic+mt.intl;
   AGENTS.Neo.target=val;
   AGENTS.Mavis.target=val;
+  AGENTS.Cassey.target=val;
+  AGENTS.Masechaba.target=val;
 })();
 const SHIP={
   none:{label:'No shipment',color:'#8fa3ba',bg:'#eef1f7'},
@@ -747,7 +753,8 @@ function setupApp(){
     addDealBtn();
     switchView('dashboard',nav.querySelector('.tb-tab'));
   } else {
-    const name=currentRole==='neo'?'Neo':'Mavis';
+    const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+    const name=roleMap[currentRole]||'Neo';
     const a=AGENTS[name];
     av.style.background=a.color;av.textContent=a.lbl;
     un.textContent=a.full;
@@ -823,7 +830,9 @@ function renderPipeline(){
   fr.innerHTML=`<span class="filter-label">Filter:</span>
     <button class="fc ${currentFilter==='all'?'active':''}" onclick="setFilter('all',this)">All agents</button>
     <button class="fc ${currentFilter==='Neo'?'active':''}" onclick="setFilter('Neo',this)">Neo</button>
-    <button class="fc ${currentFilter==='Mavis'?'active':''}" onclick="setFilter('Mavis',this)">Mavis</button>`;
+    <button class="fc ${currentFilter==='Mavis'?'active':''}" onclick="setFilter('Mavis',this)">Mavis</button>
+    <button class="fc ${currentFilter==='Cassey'?'active':''}" onclick="setFilter('Cassey',this)">Cassey</button>
+    <button class="fc ${currentFilter==='Masechaba'?'active':''}" onclick="setFilter('Masechaba',this)">Masechaba</button>`;
   renderKanban('kanban-board',currentFilter==='all'?null:currentFilter);
 }
 function setFilter(f,btn){
@@ -833,7 +842,8 @@ function setFilter(f,btn){
   renderKanban('kanban-board',f==='all'?null:f);
 }
 function renderMyDeals(){
-  const name=currentRole==='neo'?'Neo':'Mavis';
+  const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+  const name=roleMap[currentRole]||'Neo';
   renderStats('my-stats-row',name);
   renderKanban('my-kanban-board',name);
 }
@@ -944,7 +954,7 @@ function renderAgents(){
   const grid=document.getElementById('agent-cards');
   if(!grid)return;
   grid.innerHTML='';
-  ['Neo','Mavis'].forEach(name=>{
+  ['Neo','Mavis','Cassey','Masechaba'].forEach(name=>{
     const a=AGENTS[name];
     const myD=deals.filter(d=>getAgent(d)===name);
     const open=myD.filter(d=>!d.won);
@@ -1004,7 +1014,8 @@ async function saveLog(){
 function renderReportView(){
   const el=document.getElementById('report-content');
   if(!el||currentRole==='ryan')return;
-  const name=currentRole==='neo'?'Neo':'Mavis';
+  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+  const name=roleMapR[currentRole]||'Neo';
   const a=AGENTS[name];
   const existing=todaysReport(name);
   const mt=currentMonthTarget();
@@ -1054,7 +1065,8 @@ function sumWonThisMonth(name){
     .reduce((s,d)=>s+(d.value||0),0);
 }
 async function saveDailyReport(){
-  const name=currentRole==='neo'?'Neo':'Mavis';
+  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+  const name=roleMapR[currentRole]||'Neo';
   const payload={
     agent_name:name,
     report_date:todayStr(),
@@ -1091,7 +1103,7 @@ function renderReportsOverview(){
   const el=document.getElementById('reports-content');
   if(!el||currentRole!=='ryan')return;
   const mt=currentMonthTarget();
-  const names=['Neo','Mavis'];
+  const names=['Neo','Mavis','Cassey','Masechaba'];
   const today=todayStr();
   el.innerHTML=`
     <div class="qtr-strip">
@@ -1190,7 +1202,7 @@ function renderDashboard(){
     </div>
     <div class="dash-card">
       <div class="dash-card-title">Target progress</div>
-      ${['Neo','Mavis'].map(nm=>{
+      ${['Neo','Mavis','Cassey','Masechaba'].map(nm=>{
         const a=AGENTS[nm];const s=nm==='Neo'?ns:ms;
         const bc=s.tgtPct>=70?'#1aaf82':s.tgtPct>=35?'#f5a623':'#e85d3a';
         return`<div style="margin-bottom:14px">
@@ -1208,7 +1220,7 @@ function renderDashboard(){
       <div class="dash-card-title">Head-to-head</div>
       <div style="display:grid;grid-template-columns:1fr 80px 80px;margin-bottom:6px">
         <div></div>
-        ${['Neo','Mavis'].map(nm=>{const a=AGENTS[nm];return`<div style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:${a.bg};color:${a.color}">${nm}</span></div>`}).join('')}
+        ${['Neo','Mavis','Cassey','Masechaba'].map(nm=>{const a=AGENTS[nm];return`<div style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:${a.bg};color:${a.color}">${nm}</span></div>`}).join('')}
       </div>
       ${[['Open deals',ns.open,ms.open],['Won deals',ns.won,ms.won],['Pipeline value',fmt(ns.pipe),fmt(ms.pipe)],['Won value',fmt(ns.wonV),fmt(ms.wonV)],['Win rate',ns.wr+'%',ms.wr+'%'],['Total deals',ns.deals,ms.deals]]
         .map(([lbl,nv,mv])=>`<div style="display:grid;grid-template-columns:1fr 80px 80px;padding:7px 0;border-bottom:1px solid var(--border)">
@@ -1390,15 +1402,5 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
 
 
