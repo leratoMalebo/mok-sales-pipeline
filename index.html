@@ -276,6 +276,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
 .sec-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px}
 
 
+
+/* ── STALE DEALS & REMOVE ─────────────────────── */
+.stale-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fde8e3;color:#c0392b;text-transform:uppercase;letter-spacing:.04em;margin-left:4px}
+.deal-card.stale{border-color:#f5a623;border-left:3px solid #f5a623}
+.deal-card.very-stale{border-color:#e85d3a;border-left:3px solid #e85d3a}
+.remove-btn{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid var(--coral);background:transparent;color:var(--coral);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.remove-btn:hover{background:var(--coral);color:#fff}
+.stale-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.stale-panel-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.stale-list{display:flex;flex-direction:column;gap:6px}
+.stale-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.stale-item.warn{background:var(--amber-pale);border-color:var(--amber)}
+.stale-item.danger{background:var(--coral-pale);border-color:var(--coral)}
+.stale-item-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+.stale-item-company{font-size:12px;font-weight:600;color:var(--text)}
+.stale-item-meta{font-size:10px;color:var(--text3)}
+.stale-item-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.stale-days{font-size:11px;font-weight:700;font-family:"DM Mono",monospace}
+/* Remove confirm modal */
+.remove-modal-body{display:flex;flex-direction:column;gap:12px}
+.remove-warning{background:var(--coral-pale);border:1px solid var(--coral);border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;color:#7a1a0e;line-height:1.6}
+
 /* ── QUOTE BUTTON ─────────────────────────────── */
 .quote-btn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid var(--teal);background:var(--teal-pale);color:var(--teal);cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap;font-family:inherit}
 .quote-btn:hover{background:var(--teal);color:#fff}
@@ -332,7 +354,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
       <div class="login-desc">The internal sales pipeline for the Mok Transports Services team. Track every deal, manage shipments, and grow client accounts — all in one place.</div>
       <div class="login-stats">
         <div>
-          <div class="login-stat-val">5</div>
+          <div class="login-stat-val">3</div>
           <div class="login-stat-lbl">Team members</div>
         </div>
         <div class="login-stat-divider"></div>
@@ -362,8 +384,6 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
           <option value="ryan">Ryan Mokgethi · System Owner</option>
           <option value="neo">Neo Lumkwana · Operations &amp; Sales</option>
           <option value="mavis">Mavis Selomana · Operations &amp; Sales</option>
-          <option value="cassey">Cassey Mokgethi · Sales &amp; Marketing</option>
-          <option value="masechaba">Masechaba Phea · Sales &amp; Marketing</option>
         </select>
       </div>
       <div class="lf-divider"><div class="lf-divider-line"></div><div class="lf-divider-text">then enter your PIN</div><div class="lf-divider-line"></div></div>
@@ -436,7 +456,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
       <div class="fg full"><label class="fl">Company name</label><input type="text" id="f-co" placeholder="e.g. Shoprite Holdings"/></div>
       <div class="fg"><label class="fl">Value (R)</label><input type="number" id="f-val" placeholder="e.g. 75000"/></div>
       <div class="fg" id="f-agent-wrap"><label class="fl">Agent</label>
-        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option><option value="Cassey">Cassey Mokgethi</option><option value="Masechaba">Masechaba Phea</option></select>
+        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option></select>
       </div>
       <div class="fg"><label class="fl">Stage</label>
         <select id="f-stage"><option value="0">Prospecting</option><option value="1">Qualified</option><option value="2">Proposal</option><option value="3">Negotiation</option><option value="4">Closed won</option></select>
@@ -483,6 +503,36 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
   </div>
 </div>
 
+
+<!-- REMOVE DEAL MODAL -->
+<div class="overlay" id="remove-modal" onclick="closeOverlay(event,'remove-modal')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:380px">
+    <div class="modal-title" style="display:flex;align-items:center;gap:10px;color:var(--coral)">
+      <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9"/></svg>
+      Remove deal
+    </div>
+    <div class="remove-modal-body">
+      <div class="remove-warning" id="remove-modal-info"></div>
+      <div class="fg full"><label class="fl">Reason for removal</label>
+        <select id="remove-reason">
+          <option value="lost">Deal lost — client chose another supplier</option>
+          <option value="unresponsive">Client unresponsive — no contact for 30+ days</option>
+          <option value="not_qualified">Not qualified — not a real prospect</option>
+          <option value="duplicate">Duplicate entry</option>
+          <option value="other">Other reason</option>
+        </select>
+      </div>
+      <div class="fg full"><label class="fl">Notes (optional)</label>
+        <textarea id="remove-notes" rows="2" placeholder="Any additional context Ryan should know..." style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-secondary" onclick="document.getElementById('remove-modal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary" id="confirm-remove-btn" style="background:var(--coral)" onclick="confirmRemoveDeal()">Remove deal</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"></div>
 
@@ -510,7 +560,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', masechaba:'9023' };
+const PINS = { ryan:'8420', neo:'3157', mavis:'6293' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -522,9 +572,7 @@ const STAGES=[
 ];
 const AGENTS={
   Neo:{color:'#534ab7',bg:'#ede9f8',lbl:'NL',full:'Neo Lumkwana',target:200000},
-  Mavis:{color:'#d44f8a',bg:'#fce8f2',lbl:'MS',full:'Mavis Selomana',target:200000},
-  Cassey:{color:'#0f7e6e',bg:'#d6f5ee',lbl:'CM',full:'Cassey Mokgethi',target:200000},
-  Masechaba:{color:'#b45309',bg:'#fef3dc',lbl:'MP',full:'Masechaba Phea',target:200000}
+  Mavis:{color:'#d44f8a',bg:'#fce8f2',lbl:'MS',full:'Mavis Selomana',target:200000}
 };
 // ─── SALES TARGETS (Q3 2026 performance targets — same for every agent) ───────
 const QUARTER_TARGET=1300000;
@@ -549,8 +597,6 @@ const ACTIVITY_TARGETS=[
   const val=mt.domestic+mt.intl;
   AGENTS.Neo.target=val;
   AGENTS.Mavis.target=val;
-  AGENTS.Cassey.target=val;
-  AGENTS.Masechaba.target=val;
 })();
 const SHIP={
   none:{label:'No shipment',color:'#8fa3ba',bg:'#eef1f7'},
@@ -753,8 +799,7 @@ function setupApp(){
     addDealBtn();
     switchView('dashboard',nav.querySelector('.tb-tab'));
   } else {
-    const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-    const name=roleMap[currentRole]||'Neo';
+    const name=currentRole==='neo'?'Neo':'Mavis';
     const a=AGENTS[name];
     av.style.background=a.color;av.textContent=a.lbl;
     un.textContent=a.full;
@@ -804,6 +849,8 @@ function renderAll(){
   if(currentRole==='ryan'){renderDashboard();renderAgents();renderReportsOverview();}
   else{renderMyDeals();renderReportView();}
   renderCarriers();renderTips();
+  // Populate stale panel if on dashboard
+  setTimeout(()=>{const el=document.getElementById('dash-stale-list');if(el&&currentRole==='ryan')renderStalePanel(el);},50);
 }
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
@@ -826,13 +873,23 @@ function renderStats(targetEl,filterAgent){
 // ─── PIPELINE ─────────────────────────────────────────────────────────────────
 function renderPipeline(){
   renderStats('stats-row');
+  // Stale panel — owner only
+  if(currentRole==='ryan'){
+    let sp=document.getElementById('pipeline-stale-panel');
+    if(!sp){
+      sp=document.createElement('div');sp.id='pipeline-stale-panel';
+      sp.className='stale-panel';
+      sp.innerHTML='<div class="stale-panel-title">🔴 Stale deals <span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:4px">7+ days without stage movement — click Remove to delete</span></div><div class="stale-list" id="pipeline-stale-list"></div>';
+      const board=document.getElementById('kanban-board');
+      if(board)board.parentNode.insertBefore(sp,board);
+    }
+    setTimeout(()=>{const el=document.getElementById('pipeline-stale-list');if(el)renderStalePanel(el);},50);
+  }
   const fr=document.getElementById('filters-row');
   fr.innerHTML=`<span class="filter-label">Filter:</span>
     <button class="fc ${currentFilter==='all'?'active':''}" onclick="setFilter('all',this)">All agents</button>
     <button class="fc ${currentFilter==='Neo'?'active':''}" onclick="setFilter('Neo',this)">Neo</button>
-    <button class="fc ${currentFilter==='Mavis'?'active':''}" onclick="setFilter('Mavis',this)">Mavis</button>
-    <button class="fc ${currentFilter==='Cassey'?'active':''}" onclick="setFilter('Cassey',this)">Cassey</button>
-    <button class="fc ${currentFilter==='Masechaba'?'active':''}" onclick="setFilter('Masechaba',this)">Masechaba</button>`;
+    <button class="fc ${currentFilter==='Mavis'?'active':''}" onclick="setFilter('Mavis',this)">Mavis</button>`;
   renderKanban('kanban-board',currentFilter==='all'?null:currentFilter);
 }
 function setFilter(f,btn){
@@ -842,8 +899,7 @@ function setFilter(f,btn){
   renderKanban('kanban-board',f==='all'?null:f);
 }
 function renderMyDeals(){
-  const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMap[currentRole]||'Neo';
+  const name=currentRole==='neo'?'Neo':'Mavis';
   renderStats('my-stats-row',name);
   renderKanban('my-kanban-board',name);
 }
@@ -874,10 +930,18 @@ function renderKanban(boardId,agentFilter){
       const shipRow=shipKey&&shipKey!=='none'?`<div class="ship-row"><div class="ship-pill" style="background:${ss.bg};color:${ss.color}"><div class="ship-dot" style="background:${ss.color}"></div>${CARRIER_LABELS[carrierKey]||carrierKey} · ${ss.label}</div></div>`:'';
       const dealId=d.id;
       const af2=agentFilter||'';
-      card.innerHTML=`<div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}<div class="deal-actions"><button class="advance-btn" data-id="${dealId}" data-board="${boardId}" data-af="${agentFilter||''}">Advance stage →</button><button class="quote-btn" data-id="${dealId}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>Quote</button></div>`;
+      const ageDays=dealAgeDays(d);
+      const isStale=ageDays>=STALE_WARN_DAYS&&!d.won;
+      const isVeryStale=ageDays>=STALE_DANGER_DAYS&&!d.won;
+      if(isVeryStale)card.classList.add('very-stale');
+      else if(isStale)card.classList.add('stale');
+      const staleBadge=isVeryStale?`<span class="stale-badge">⚠ ${ageDays}d stale</span>`:isStale?`<span class="stale-badge" style="background:#fef3dc;color:#9a6800">${ageDays}d</span>`:'';
+      const removeBtn=currentRole==='ryan'?`<button class="remove-btn" data-id="${dealId}">Remove</button>`:'';
+      card.innerHTML=`<div class="deal-name">${d.company}${staleBadge}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}<div class="deal-actions"><button class="advance-btn" data-id="${dealId}" data-board="${boardId}" data-af="${agentFilter||''}">Advance stage →</button><div style="display:flex;gap:4px"><button class="quote-btn" data-id="${dealId}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>Quote</button>${removeBtn}</div></div>`;
       if(d.notes)card.title=d.notes;
       card.querySelector('.advance-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));advanceDeal(deal,boardId,agentFilter);});
       card.querySelector('.quote-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));if(deal)openQuoteModal(deal);});
+      const rb=card.querySelector('.remove-btn');if(rb)rb.addEventListener('click',e=>{e.stopPropagation();openRemoveModal(dealId);});
       cc.appendChild(card);
     });
   });
@@ -898,6 +962,98 @@ async function advanceDeal(d,boardId,af){
   renderStats(boardId==='my-kanban-board'?'my-stats-row':'stats-row',af);
   if(currentRole==='ryan'){renderDashboard();renderAgents();}
 }
+
+
+// ─── STALE DEAL DETECTION & REMOVAL ─────────────────────────────────────────
+const STALE_WARN_DAYS  = 7;   // amber warning
+const STALE_DANGER_DAYS = 14; // red — owner should remove
+
+function dealAgeDays(d){
+  const created = new Date(d.created_at || Date.now());
+  return Math.floor((Date.now() - created.getTime()) / 86400000);
+}
+
+function staleDeals(){
+  return deals
+    .filter(d => !d.won && dealAgeDays(d) >= STALE_WARN_DAYS)
+    .sort((a,b) => dealAgeDays(b) - dealAgeDays(a));
+}
+
+let removeDealTarget = null;
+
+function openRemoveModal(dealId){
+  if(currentRole !== 'ryan'){toast('Only Ryan can remove deals.','error');return;}
+  const d = deals.find(x => x.id === dealId || x.id === Number(dealId));
+  if(!d) return;
+  removeDealTarget = d;
+  const days = dealAgeDays(d);
+  const agent = getAgent(d);
+  const stage = STAGES[d.stage]?.label || '';
+  document.getElementById('remove-modal-info').innerHTML =
+    `<strong>${d.company}</strong><br>Agent: ${agent} &nbsp;·&nbsp; Stage: ${stage} &nbsp;·&nbsp; Value: ${fmt(d.value)}<br>` +
+    `<span style="color:var(--coral);font-weight:600">${days} days in pipeline without progressing</span>`;
+  document.getElementById('remove-notes').value = '';
+  document.getElementById('remove-modal').classList.add('open');
+}
+
+async function confirmRemoveDeal(){
+  if(!removeDealTarget){return;}
+  const reason = document.getElementById('remove-reason').value;
+  const notes  = document.getElementById('remove-notes').value.trim();
+  const btn    = document.getElementById('confirm-remove-btn');
+  btn.disabled = true; btn.textContent = 'Removing...';
+
+  // Log removal activity before deleting
+  await saveActivityToDB(
+    getAgent(removeDealTarget),
+    'Deal removed by Ryan Mokgethi · Reason: ' + reason + (notes ? ' · ' + notes : ''),
+    removeDealTarget.id
+  );
+
+  // Delete from Supabase
+  const {error} = await sb.from('deals').delete().eq('id', removeDealTarget.id);
+  btn.disabled = false; btn.textContent = 'Remove deal';
+  if(error){toast('Error removing deal: ' + error.message, 'error'); return;}
+
+  // Remove from local array
+  deals = deals.filter(x => x.id !== removeDealTarget.id && x.id !== Number(removeDealTarget.id));
+  removeDealTarget = null;
+  document.getElementById('remove-modal').classList.remove('open');
+  toast('Deal removed ✓', 'success');
+  renderPipeline();
+  renderDashboard();
+  renderAgents();
+}
+
+function renderStalePanel(containerEl){
+  const stale = staleDeals();
+  if(!stale.length){
+    containerEl.innerHTML = `<div style="font-size:11px;color:var(--text3);font-style:italic;padding:4px 0">No stale deals — pipeline is healthy ✓</div>`;
+    return;
+  }
+  containerEl.innerHTML = stale.map(d => {
+    const days   = dealAgeDays(d);
+    const cls    = days >= STALE_DANGER_DAYS ? 'danger' : 'warn';
+    const agent  = getAgent(d);
+    const a      = AGENTS[agent] || {color:'#8fa3ba',bg:'#eef1f7',lbl:'??'};
+    const stage  = STAGES[d.stage]?.label || '';
+    const color  = days >= STALE_DANGER_DAYS ? 'var(--coral)' : 'var(--amber)';
+    return `<div class="stale-item ${cls}">
+      <div class="stale-item-left">
+        <div class="stale-item-company">${d.company}</div>
+        <div class="stale-item-meta">
+          <span class="agent-badge" style="background:${a.bg};color:${a.color};font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600">${agent}</span>
+          &nbsp;${stage} · ${fmt(d.value)}
+        </div>
+      </div>
+      <div class="stale-item-right">
+        <span class="stale-days" style="color:${color}">${days}d</span>
+        <button class="remove-btn" onclick="openRemoveModal('${d.id}')">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 
 // ─── QUOTE ────────────────────────────────────────────────────────────────────
 const QUOTE_BASE='https://mok-quotation-system.vercel.app/';
@@ -954,7 +1110,7 @@ function renderAgents(){
   const grid=document.getElementById('agent-cards');
   if(!grid)return;
   grid.innerHTML='';
-  ['Neo','Mavis','Cassey','Masechaba'].forEach(name=>{
+  ['Neo','Mavis'].forEach(name=>{
     const a=AGENTS[name];
     const myD=deals.filter(d=>getAgent(d)===name);
     const open=myD.filter(d=>!d.won);
@@ -1014,8 +1170,7 @@ async function saveLog(){
 function renderReportView(){
   const el=document.getElementById('report-content');
   if(!el||currentRole==='ryan')return;
-  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMapR[currentRole]||'Neo';
+  const name=currentRole==='neo'?'Neo':'Mavis';
   const a=AGENTS[name];
   const existing=todaysReport(name);
   const mt=currentMonthTarget();
@@ -1065,8 +1220,7 @@ function sumWonThisMonth(name){
     .reduce((s,d)=>s+(d.value||0),0);
 }
 async function saveDailyReport(){
-  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMapR[currentRole]||'Neo';
+  const name=currentRole==='neo'?'Neo':'Mavis';
   const payload={
     agent_name:name,
     report_date:todayStr(),
@@ -1103,7 +1257,7 @@ function renderReportsOverview(){
   const el=document.getElementById('reports-content');
   if(!el||currentRole!=='ryan')return;
   const mt=currentMonthTarget();
-  const names=['Neo','Mavis','Cassey','Masechaba'];
+  const names=['Neo','Mavis'];
   const today=todayStr();
   el.innerHTML=`
     <div class="qtr-strip">
@@ -1202,7 +1356,7 @@ function renderDashboard(){
     </div>
     <div class="dash-card">
       <div class="dash-card-title">Target progress</div>
-      ${['Neo','Mavis','Cassey','Masechaba'].map(nm=>{
+      ${['Neo','Mavis'].map(nm=>{
         const a=AGENTS[nm];const s=nm==='Neo'?ns:ms;
         const bc=s.tgtPct>=70?'#1aaf82':s.tgtPct>=35?'#f5a623':'#e85d3a';
         return`<div style="margin-bottom:14px">
@@ -1220,7 +1374,7 @@ function renderDashboard(){
       <div class="dash-card-title">Head-to-head</div>
       <div style="display:grid;grid-template-columns:1fr 80px 80px;margin-bottom:6px">
         <div></div>
-        ${['Neo','Mavis','Cassey','Masechaba'].map(nm=>{const a=AGENTS[nm];return`<div style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:${a.bg};color:${a.color}">${nm}</span></div>`}).join('')}
+        ${['Neo','Mavis'].map(nm=>{const a=AGENTS[nm];return`<div style="text-align:center"><span style="font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;background:${a.bg};color:${a.color}">${nm}</span></div>`}).join('')}
       </div>
       ${[['Open deals',ns.open,ms.open],['Won deals',ns.won,ms.won],['Pipeline value',fmt(ns.pipe),fmt(ms.pipe)],['Won value',fmt(ns.wonV),fmt(ms.wonV)],['Win rate',ns.wr+'%',ms.wr+'%'],['Total deals',ns.deals,ms.deals]]
         .map(([lbl,nv,mv])=>`<div style="display:grid;grid-template-columns:1fr 80px 80px;padding:7px 0;border-bottom:1px solid var(--border)">
@@ -1228,6 +1382,13 @@ function renderDashboard(){
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Neo.color};text-align:center;font-family:'DM Mono',monospace">${nv}</div>
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Mavis.color};text-align:center;font-family:'DM Mono',monospace">${mv}</div>
         </div>`).join('')}
+    </div>
+    <div class="dash-card" style="grid-column:span 3">
+      <div class="dash-card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>🔴 Stale deals — needs attention</span>
+        <span style="font-size:10px;font-weight:400;color:var(--text3)">Amber = 7+ days · Red = 14+ days · Ryan only can remove</span>
+      </div>
+      <div class="stale-list" id="dash-stale-list"></div>
     </div>
     <div class="dash-card">
       <div class="dash-card-title">Owner alerts</div>
