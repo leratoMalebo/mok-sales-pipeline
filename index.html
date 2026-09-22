@@ -307,6 +307,27 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
   .kanban{grid-template-columns:repeat(2,minmax(0,1fr))}
   .stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* ── STALE & REMOVE ──────────────────────────── */
+.stale-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;margin-left:5px;vertical-align:middle}
+.stale-amber{background:#fef3dc;color:#9a6800}
+.stale-red{background:#fde8e3;color:#c0392b}
+.deal-card.is-stale{border-left:3px solid #f5a623}
+.deal-card.is-very-stale{border-left:3px solid #e85d3a}
+.remove-btn{font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;border:1px solid var(--coral);background:transparent;color:var(--coral);cursor:pointer;font-family:inherit;transition:all .15s}
+.remove-btn:hover{background:var(--coral);color:#fff}
+.stale-panel{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.stale-panel-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.stale-list{display:flex;flex-direction:column;gap:6px}
+.stale-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+.stale-row.amber{background:var(--amber-pale);border-color:var(--amber)}
+.stale-row.red{background:var(--coral-pale);border-color:var(--coral)}
+.stale-row-left{display:flex;flex-direction:column;gap:2px}
+.stale-company{font-size:12px;font-weight:600;color:var(--text)}
+.stale-meta{font-size:10px;color:var(--text3)}
+.stale-right{display:flex;align-items:center;gap:8px}
+.stale-days{font-size:11px;font-weight:700;font-family:"DM Mono",monospace}
+.remove-modal-warning{background:var(--coral-pale);border:1px solid var(--coral);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:#7a1a0e;line-height:1.6;margin-bottom:14px}
 </style>
 </head>
 <body>
@@ -479,6 +500,35 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
     <div class="modal-btns">
       <button class="btn-secondary" onclick="document.getElementById('log-modal').classList.remove('open')">Cancel</button>
       <button class="btn-primary" id="save-log-btn" onclick="saveLog()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMOVE DEAL MODAL -->
+<div class="overlay" id="remove-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" onclick="event.stopPropagation()" style="width:400px">
+    <div class="modal-title" style="color:var(--coral);display:flex;align-items:center;gap:8px">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9a1 1 0 001 1h6a1 1 0 001-1l1-9"/></svg>
+      Remove deal
+    </div>
+    <div class="remove-modal-warning" id="rm-info"></div>
+    <div class="fg full" style="margin-bottom:10px">
+      <label class="fl">Reason for removal</label>
+      <select id="rm-reason">
+        <option value="lost">Deal lost — client chose another supplier</option>
+        <option value="unresponsive">Client unresponsive — no contact for 30+ days</option>
+        <option value="not_qualified">Not qualified — not a real prospect</option>
+        <option value="duplicate">Duplicate entry</option>
+        <option value="other">Other reason</option>
+      </select>
+    </div>
+    <div class="fg full">
+      <label class="fl">Notes (optional)</label>
+      <textarea id="rm-notes" rows="2" placeholder="Any additional context..." style="width:100%;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border2);font-family:inherit;font-size:12px;resize:vertical"></textarea>
+    </div>
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-secondary" onclick="document.getElementById('remove-modal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary" id="rm-btn" style="background:var(--coral)" onclick="confirmRemoveDeal()">Remove deal</button>
     </div>
   </div>
 </div>
@@ -753,8 +803,8 @@ function setupApp(){
     addDealBtn();
     switchView('dashboard',nav.querySelector('.tb-tab'));
   } else {
-    const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-    const name=roleMap[currentRole]||'Neo';
+    const _rm={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+    const name=_rm[currentRole]||'Neo';
     const a=AGENTS[name];
     av.style.background=a.color;av.textContent=a.lbl;
     un.textContent=a.full;
@@ -804,6 +854,7 @@ function renderAll(){
   if(currentRole==='ryan'){renderDashboard();renderAgents();renderReportsOverview();}
   else{renderMyDeals();renderReportView();}
   renderCarriers();renderTips();
+  setTimeout(()=>{const _dsl=document.getElementById('dash-stale-list');if(_dsl&&currentRole==='ryan')buildStalePanel(_dsl);},80);
 }
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
@@ -826,6 +877,16 @@ function renderStats(targetEl,filterAgent){
 // ─── PIPELINE ─────────────────────────────────────────────────────────────────
 function renderPipeline(){
   renderStats('stats-row');
+  if(currentRole==='ryan'){
+    let _sp=document.getElementById('pl-stale');
+    if(!_sp){
+      _sp=document.createElement('div');_sp.id='pl-stale';_sp.className='stale-panel';
+      _sp.innerHTML='<div class="stale-panel-title">🔴 Stale deals — needs attention &nbsp;<span style="font-size:9px;font-weight:400">Amber=7+ days · Red=14+ days</span></div><div class="stale-list" id="pl-stale-list"></div>';
+      const _kb=document.getElementById('kanban-board');
+      if(_kb)_kb.parentNode.insertBefore(_sp,_kb);
+    }
+    setTimeout(()=>{const _el=document.getElementById('pl-stale-list');if(_el)buildStalePanel(_el);},60);
+  }
   const fr=document.getElementById('filters-row');
   fr.innerHTML=`<span class="filter-label">Filter:</span>
     <button class="fc ${currentFilter==='all'?'active':''}" onclick="setFilter('all',this)">All agents</button>
@@ -842,8 +903,8 @@ function setFilter(f,btn){
   renderKanban('kanban-board',f==='all'?null:f);
 }
 function renderMyDeals(){
-  const roleMap={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMap[currentRole]||'Neo';
+  const _rm={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+  const name=_rm[currentRole]||'Neo';
   renderStats('my-stats-row',name);
   renderKanban('my-kanban-board',name);
 }
@@ -874,10 +935,18 @@ function renderKanban(boardId,agentFilter){
       const shipRow=shipKey&&shipKey!=='none'?`<div class="ship-row"><div class="ship-pill" style="background:${ss.bg};color:${ss.color}"><div class="ship-dot" style="background:${ss.color}"></div>${CARRIER_LABELS[carrierKey]||carrierKey} · ${ss.label}</div></div>`:'';
       const dealId=d.id;
       const af2=agentFilter||'';
-      card.innerHTML=`<div class="deal-name">${d.company}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}<div class="deal-actions"><button class="advance-btn" data-id="${dealId}" data-board="${boardId}" data-af="${agentFilter||''}">Advance stage →</button><button class="quote-btn" data-id="${dealId}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>Quote</button></div>`;
+      const _days=ageInDays(d);
+      const _vStale=!d.won&&_days>=STALE_BAD;
+      const _stale=!d.won&&_days>=STALE_WARN;
+      if(_vStale)card.classList.add('is-very-stale');
+      else if(_stale)card.classList.add('is-stale');
+      const _badge=_vStale?`<span class="stale-badge stale-red">⚠ ${_days}d</span>`:_stale?`<span class="stale-badge stale-amber">${_days}d</span>`:'';
+      const _rmBtn=currentRole==='ryan'?`<button class="remove-btn" data-rid="${dealId}">Remove</button>`:'';
+      card.innerHTML=`<div class="deal-name">${d.company}${_badge}</div><div class="deal-value">${fmt(d.value)}</div><div class="deal-meta"><span class="agent-badge" style="background:${a.bg};color:${a.color}">${agentName}</span><span class="deal-date">${fmtDate(d.created_at||new Date())}</span></div>${shipRow}<div class="deal-actions"><button class="advance-btn" data-id="${dealId}" data-board="${boardId}" data-af="${agentFilter||''}">Advance stage →</button><div style="display:flex;gap:4px"><button class="quote-btn" data-id="${dealId}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 2H4a1 1 0 00-1 1v10a1 1 0 001 1h8a1 1 0 001-1V6l-4-4z"/><path d="M9 2v4h4"/><path d="M5 9h6M5 11h4"/></svg>Quote</button>${_rmBtn}</div></div>`;
       if(d.notes)card.title=d.notes;
       card.querySelector('.advance-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));advanceDeal(deal,boardId,agentFilter);});
       card.querySelector('.quote-btn').addEventListener('click',e=>{e.stopPropagation();const deal=deals.find(x=>x.id===dealId||x.id===Number(dealId));if(deal)openQuoteModal(deal);});
+      const _rb=card.querySelector('.remove-btn');if(_rb)_rb.addEventListener('click',e=>{e.stopPropagation();openRemoveModal(dealId);});
       cc.appendChild(card);
     });
   });
@@ -1014,8 +1083,8 @@ async function saveLog(){
 function renderReportView(){
   const el=document.getElementById('report-content');
   if(!el||currentRole==='ryan')return;
-  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMapR[currentRole]||'Neo';
+  const _rm={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
+  const name=_rm[currentRole]||'Neo';
   const a=AGENTS[name];
   const existing=todaysReport(name);
   const mt=currentMonthTarget();
@@ -1065,8 +1134,7 @@ function sumWonThisMonth(name){
     .reduce((s,d)=>s+(d.value||0),0);
 }
 async function saveDailyReport(){
-  const roleMapR={neo:'Neo',mavis:'Mavis',cassey:'Cassey',masechaba:'Masechaba'};
-  const name=roleMapR[currentRole]||'Neo';
+  const name=currentRole==='neo'?'Neo':'Mavis';
   const payload={
     agent_name:name,
     report_date:todayStr(),
@@ -1103,7 +1171,7 @@ function renderReportsOverview(){
   const el=document.getElementById('reports-content');
   if(!el||currentRole!=='ryan')return;
   const mt=currentMonthTarget();
-  const names=['Neo','Mavis','Cassey','Masechaba'];
+  const names=['Neo','Mavis'];
   const today=todayStr();
   el.innerHTML=`
     <div class="qtr-strip">
@@ -1228,6 +1296,10 @@ function renderDashboard(){
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Neo.color};text-align:center;font-family:'DM Mono',monospace">${nv}</div>
           <div style="font-size:12px;font-weight:600;color:${AGENTS.Mavis.color};text-align:center;font-family:'DM Mono',monospace">${mv}</div>
         </div>`).join('')}
+    </div>
+    <div class="dash-card" style="grid-column:span 3">
+      <div class="dash-card-title">🔴 Stale deals &nbsp;<span style="font-size:10px;font-weight:400;color:var(--text3)">Deals with no stage movement · Amber = 7+ days · Red = 14+ days · Only Ryan can remove</span></div>
+      <div class="stale-list" id="dash-stale-list"></div>
     </div>
     <div class="dash-card">
       <div class="dash-card-title">Owner alerts</div>
@@ -1399,30 +1471,116 @@ window.addEventListener('DOMContentLoaded',()=>{
     document.getElementById('login-screen').style.display='flex';
   },800);
 });
+// ─── STALE DEAL DETECTION ────────────────────────────────────────────────────
+const STALE_WARN=7;   // amber: 7+ days same stage
+const STALE_BAD=14;   // red: 14+ days same stage
+
+function ageInDays(d){
+  return Math.floor((Date.now()-new Date(d.created_at||Date.now()).getTime())/86400000);
+}
+function getStaleDeals(){
+  return deals.filter(d=>!d.won&&ageInDays(d)>=STALE_WARN).sort((a,b)=>ageInDays(b)-ageInDays(a));
+}
+
+// ─── REMOVE DEAL ─────────────────────────────────────────────────────────────
+let _removTarget=null;
+
+function openRemoveModal(idOrEl){
+  const dealId=typeof idOrEl==='object'?idOrEl.dataset.id:idOrEl;
+  if(currentRole!=='ryan'){toast('Only Ryan Mokgethi can remove deals.','error');return;}
+  const d=deals.find(x=>String(x.id)===String(dealId));
+  if(!d){toast('Deal not found.','error');return;}
+  _removTarget=d;
+  const days=ageInDays(d);
+  document.getElementById('rm-info').innerHTML=
+    '<strong>'+d.company+'</strong><br>'+
+    'Agent: '+getAgent(d)+' &nbsp;·&nbsp; Stage: '+(STAGES[d.stage]?.label||'')+' &nbsp;·&nbsp; Value: '+fmt(d.value)+'<br>'+
+    '<span style="color:var(--coral);font-weight:600">'+days+' days in pipeline without progressing</span>';
+  document.getElementById('rm-notes').value='';
+  document.getElementById('remove-modal').classList.add('open');
+}
+
+async function confirmRemoveDeal(){
+  if(!_removTarget)return;
+  const reason=document.getElementById('rm-reason').value;
+  const notes=document.getElementById('rm-notes').value.trim();
+  const btn=document.getElementById('rm-btn');
+  btn.disabled=true;btn.textContent='Removing...';
+
+  const id=_removTarget.id;
+
+  // Step 1 — delete linked activity_log rows first (fixes FK constraint)
+  await sb.from('activity_log').delete().eq('deal_id',id);
+
+  // Step 2 — log the removal with no deal_id (avoids FK issue)
+  await sb.from('activity_log').insert([{
+    agent_name:getAgent(_removTarget),
+    note:'Deal REMOVED by Ryan Mokgethi · '+_removTarget.company+' · Reason: '+reason+(notes?' · '+notes:''),
+    deal_id:null
+  }]);
+
+  // Step 3 — delete the deal
+  const{error}=await sb.from('deals').delete().eq('id',id);
+  btn.disabled=false;btn.textContent='Remove deal';
+
+  if(error){toast('Error: '+error.message,'error');return;}
+
+  deals=deals.filter(x=>String(x.id)!==String(id));
+  _removTarget=null;
+  document.getElementById('remove-modal').classList.remove('open');
+  toast('Deal removed successfully ✓','success');
+
+  // Refresh whichever view is active
+  const av=document.querySelector('.view.active');
+  if(av){
+    if(av.id==='view-pipeline')renderPipeline();
+    else if(av.id==='view-mydeals')renderMyDeals();
+    else if(av.id==='view-dashboard')renderDashboard();
+  }
+  if(currentRole==='ryan')renderDashboard();
+}
+
+function buildStalePanel(listEl){
+  const stale=getStaleDeals();
+  if(!stale.length){
+    listEl.innerHTML='<div style="font-size:11px;color:var(--text3);font-style:italic">No stale deals — pipeline is healthy</div>';
+    return;
+  }
+  var rows=[];
+  for(var i=0;i<stale.length;i++){
+    var d=stale[i];
+    var days=ageInDays(d);
+    var cls=days>=STALE_BAD?'red':'amber';
+    var col=days>=STALE_BAD?'var(--coral)':'var(--amber)';
+    var ag=getAgent(d);
+    var a=AGENTS[ag]||{color:'#8fa3ba',bg:'#eef1f7',lbl:'?'};
+    var stage=(STAGES[d.stage]&&STAGES[d.stage].label)||'';
+    var rmBtn='';
+    if(currentRole==='ryan'){
+      rmBtn='<button class="remove-btn" data-dealid="'+d.id+'" onclick="openRemoveModal(this.dataset.dealid)">Remove</button>';
+    }
+    rows.push(
+      '<div class="stale-row '+cls+'">'
+      +'<div class="stale-row-left">'
+      +'<div class="stale-company">'+d.company+'</div>'
+      +'<div class="stale-meta">'
+      +'<span style="background:'+a.bg+';color:'+a.color+';padding:1px 6px;border-radius:10px;font-weight:600;font-size:10px">'+ag+'</span>'
+      +' &nbsp;'+stage+' &middot; '+fmt(d.value)
+      +'</div>'
+      +'</div>'
+      +'<div class="stale-right">'
+      +'<span class="stale-days" style="color:'+col+'">'+days+'d</span>'
+      +rmBtn
+      +'</div>'
+      +'</div>'
+    );
+  }
+  listEl.innerHTML=rows.join('');
+}
+
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
