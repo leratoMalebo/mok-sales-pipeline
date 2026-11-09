@@ -382,7 +382,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
           <option value="">— Choose profile —</option>
           <option value="ryan">Ryan Mokgethi · System Owner</option>
           <option value="neo">Neo Lumkwana · Operations &amp; Sales</option>
-          <option value="neo">Gugulethu ndlovu · Operations &amp; Sales</option>
+          <option value="neo">Gugulethu Ndlovu · Operations &amp; Sales</option>
           <option value="mavis">Mavis Selomana · Operations &amp; Sales</option>
           <option value="cassey">Cassey Mokgethi · Sales &amp; Marketing</option>
           <option value="masechaba">Masechaba Phea · Sales &amp; Marketing</option>
@@ -458,7 +458,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
       <div class="fg full"><label class="fl">Company name</label><input type="text" id="f-co" placeholder="e.g. Shoprite Holdings"/></div>
       <div class="fg"><label class="fl">Value (R)</label><input type="number" id="f-val" placeholder="e.g. 75000"/></div>
       <div class="fg" id="f-agent-wrap"><label class="fl">Agent</label>
-        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option><option value="Cassey">Cassey Mokgethi</option><option value="Masechaba">Masechaba Phea</option></select>
+        <select id="f-agent"><option value="Neo">Neo Lumkwana</option><option value="Mavis">Mavis Selomana</option><option value="Gugulethu">Gugulethu Ndlovu</option><option value="Cassey">Cassey Mokgethi</option><option value="Masechaba">Masechaba Phea</option></select>
       </div>
       <div class="fg"><label class="fl">Stage</label>
         <select id="f-stage"><option value="0">Prospecting</option><option value="1">Qualified</option><option value="2">Proposal</option><option value="3">Negotiation</option><option value="4">Closed won</option></select>
@@ -561,7 +561,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', gugu:'3450',masechaba:'9023' };
+const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', gugulethu:'3450',masechaba:'9023' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -1582,6 +1582,10 @@ function buildStalePanel(listEl){
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
