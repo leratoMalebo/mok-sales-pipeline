@@ -382,6 +382,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);ba
           <option value="">— Choose profile —</option>
           <option value="ryan">Ryan Mokgethi · System Owner</option>
           <option value="neo">Neo Lumkwana · Operations &amp; Sales</option>
+          <option value="neo">Gugulethu ndlovu · Operations &amp; Sales</option>
           <option value="mavis">Mavis Selomana · Operations &amp; Sales</option>
           <option value="cassey">Cassey Mokgethi · Sales &amp; Marketing</option>
           <option value="masechaba">Masechaba Phea · Sales &amp; Marketing</option>
@@ -560,7 +561,7 @@ const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── PINS (change these or store in Supabase agents table) ────────────────────
-const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', masechaba:'9023' };
+const PINS = { ryan:'8420', neo:'3157', mavis:'6293', cassey:'5690', gugu:'3450',masechaba:'9023' };
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 const STAGES=[
@@ -1581,6 +1582,10 @@ function buildStalePanel(listEl){
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
